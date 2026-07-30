@@ -16,6 +16,27 @@ a:hover { color: var(--color-accent); text-decoration: underline; }
 .ab-photo img { width: 100%; height: 100%; object-fit: contain; display: block; }
 @media (max-width: 760px) { .ab-row, .ab-row.rev { grid-template-columns: 1fr; } .ab-row.rev .ab-photo { order: 0; } }
 
+/* — product card is clickable (opens modal) — */
+.ab-row {
+  cursor: pointer;
+  border-radius: var(--radius-md);
+  transition: background .15s ease;
+}
+.ab-row:hover,
+.ab-row:focus-visible {
+  background: color-mix(in srgb, var(--color-accent) 4%, transparent);
+}
+.ab-row:hover .ab-photo,
+.ab-row:focus-visible .ab-photo {
+  box-shadow: var(--shadow-md);
+}
+.ab-row:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 4px;
+}
+/* el link de WhatsApp dentro de la card no debe heredar el cursor "abrir modal" de forma confusa */
+.ab-row .js-wa-link { cursor: pointer; }
+
 /* — hero — */
 .ab-hero {
   position: relative;
@@ -129,4 +150,129 @@ a:hover { color: var(--color-accent); text-decoration: underline; }
     transition: max-height .3s ease, opacity .2s ease;
   }
   .nav-links.is-open { max-height: 300px; opacity: 1; }
+}
+
+/* ————————————————————————————————————————————
+   Modal de producto
+   ———————————————————————————————————————————— */
+.ab-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(16px, 4vw, 40px);
+  background: color-mix(in srgb, #1a1610 55%, transparent);
+  opacity: 0;
+  transition: opacity .2s ease;
+}
+.ab-modal-backdrop[hidden] { display: none; }
+.ab-modal-backdrop.is-open { opacity: 1; }
+
+.ab-modal {
+  position: relative;
+  width: min(920px, 100%);
+  max-height: min(88vh, 780px);
+  overflow-y: auto;
+  background: var(--color-bg);
+  border: 1px solid var(--color-divider);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  display: grid;
+  grid-template-columns: minmax(0,1fr) minmax(0,1fr);
+  gap: clamp(20px, 3vw, 40px);
+  padding: clamp(24px, 3.5vw, 40px);
+  transform: translateY(10px) scale(.98);
+  transition: transform .2s ease;
+}
+.ab-modal-backdrop.is-open .ab-modal { transform: translateY(0) scale(1); }
+
+@media (max-width: 760px) {
+  .ab-modal { grid-template-columns: 1fr; max-height: 92vh; }
+}
+
+.ab-modal-close {
+  position: absolute;
+  top: clamp(12px,2vw,20px);
+  right: clamp(12px,2vw,20px);
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  border: 1px solid var(--color-divider);
+  background: var(--color-bg);
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.ab-modal-close:hover { background: color-mix(in srgb, var(--color-text) 7%, transparent); }
+
+.ab-modal-gallery { display: flex; flex-direction: column; gap: var(--space-3); min-width: 0; }
+.ab-modal-main {
+  position: relative;
+  aspect-ratio: 4/5;
+  background: var(--color-accent-100);
+  overflow: hidden;
+  border-radius: var(--radius-md);
+}
+.ab-modal-main img { width: 100%; height: 100%; object-fit: contain; display: block; }
+
+.ab-modal-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 38px; height: 38px;
+  border-radius: 50%;
+  border: 1px solid var(--color-divider);
+  background: color-mix(in srgb, var(--color-bg) 88%, transparent);
+  font-size: 20px;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+}
+.ab-modal-arrow.prev { left: var(--space-3); }
+.ab-modal-arrow.next { right: var(--space-3); }
+.ab-modal-arrow:hover { background: var(--color-bg); }
+
+.ab-modal-thumbs { display: flex; gap: var(--space-2); overflow-x: auto; }
+.ab-modal-thumb {
+  flex: none;
+  width: 56px; height: 56px;
+  padding: 0;
+  border: 1.5px solid transparent;
+  border-radius: var(--radius-sm);
+  background: var(--color-accent-100);
+  cursor: pointer;
+  overflow: hidden;
+}
+.ab-modal-thumb img { width: 100%; height: 100%; object-fit: contain; display: block; }
+.ab-modal-thumb.is-active { border-color: var(--color-accent-700); }
+
+.ab-modal-info { display: flex; flex-direction: column; min-width: 0; }
+.ab-modal-info h2 {
+  font-family: var(--font-heading);
+  font-weight: var(--font-heading-weight);
+  font-size: clamp(24px, 2.6vw, 32px);
+  margin: var(--space-3) 0 0;
+  letter-spacing: 0;
+}
+.ab-modal-info p {
+  margin: var(--space-3) 0 0;
+  font-size: 15px;
+  line-height: 1.6;
+}
+#abModalPrice {
+  font-family: var(--font-heading);
+  font-weight: var(--font-heading-weight);
+  font-size: 26px;
+  color: var(--color-accent-700);
+  margin-top: var(--space-4);
+}
+.ab-modal-info .btn {
+  margin-top: var(--space-5);
+  align-self: flex-start;
 }
