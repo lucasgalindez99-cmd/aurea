@@ -38,26 +38,28 @@ function render() {
     const msg = SALUDO + "\n\n" + p.name + " - " + formatPrice(p.price);
     const url = "https://wa.me/" + WHATSAPP_NUMBER.replace(/[^0-9]/g, "") + "?text=" + encodeURIComponent(msg);
     const rowClass = i % 2 === 1 ? "rev" : "";
-    const tagClass = p.stock ? "tag-neutral" : "tag-outline";
+    const tagClass = p.stock ? "tag-accent-2" : "tag-neutral";
     const stockLabel = p.stock ? "Disponible" : "Agotado";
     return `
-      <div class="ab-wrap">
-        <div class="ab-row ${rowClass}">
-          <figure class="ab-photo" style="margin:0;">
-            <img src="${placeholder}" alt="Foto de ${p.name}">
-          </figure>
-          <div>
-            <div style="display:flex;align-items:center;gap:var(--space-3);margin-bottom:var(--space-3);">
-              <span class="tag ${tagClass}">${stockLabel}</span>
+      <div class="product-band${i % 2 === 0 ? " tint" : ""}">
+        <div class="ab-wrap">
+          <div class="ab-row ${rowClass}">
+            <figure class="ab-photo" style="margin:0;">
+              <img src="${placeholder}" alt="Foto de ${p.name}">
+            </figure>
+            <div>
+              <div style="display:flex;align-items:center;gap:var(--space-3);margin-bottom:var(--space-3);">
+                <span class="tag ${tagClass}">${stockLabel}</span>
+              </div>
+              <h2 style="font-family:var(--font-heading);font-weight:var(--font-heading-weight);font-size:clamp(26px,3vw,36px);letter-spacing:0;margin:0;">${p.name}</h2>
+              <p style="font-size:15.5px;line-height:1.65;max-width:42ch;margin:var(--space-4) 0 0;color:color-mix(in srgb,var(--color-text) 78%,transparent);">${p.desc}</p>
+              <p style="font-size:13px;margin:var(--space-3) 0 0;color:color-mix(in srgb,var(--color-text) 58%,transparent);">Medidas: ${p.medidas}</p>
+              <p style="font-family:var(--font-heading);font-weight:var(--font-heading-weight);font-size:26px;color:var(--color-accent-700);margin:var(--space-5) 0 0;">${formatPrice(p.price)}</p>
+              <a href="${url}" target="_blank" rel="noopener" class="btn btn-secondary" style="margin-top:var(--space-5);display:inline-flex;">Consultar por WhatsApp</a>
             </div>
-            <h2 style="font-family:var(--font-heading);font-weight:var(--font-heading-weight);font-size:clamp(26px,3vw,36px);letter-spacing:0;margin:0;">${p.name}</h2>
-            <p style="font-size:15.5px;line-height:1.65;max-width:42ch;margin:var(--space-4) 0 0;color:color-mix(in srgb,var(--color-text) 78%,transparent);">${p.desc}</p>
-            <p style="font-size:13px;margin:var(--space-3) 0 0;color:color-mix(in srgb,var(--color-text) 58%,transparent);">Medidas: ${p.medidas}</p>
-            <p style="font-family:var(--font-heading);font-weight:var(--font-heading-weight);font-size:26px;color:var(--color-accent-700);margin:var(--space-5) 0 0;">${formatPrice(p.price)}</p>
-            <a href="${url}" target="_blank" rel="noopener" class="btn btn-secondary" style="margin-top:var(--space-5);display:inline-flex;">Consultar por WhatsApp</a>
           </div>
+          <hr class="hr">
         </div>
-        <hr class="hr">
       </div>`;
   }).join("");
 }
