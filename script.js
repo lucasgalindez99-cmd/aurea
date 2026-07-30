@@ -52,13 +52,13 @@ function render() {
   root.innerHTML = products.map((p, i) => {
     const url = whatsappUrl(p);
     const rowClass = i % 2 === 1 ? "rev" : "";
-    const tagClass = p.stock ? "tag-neutral" : "tag-outline";
+    const tagClass = p.stock ? "tag-accent-2" : "tag-neutral";
     const stockLabel = p.stock ? "Disponible" : "Agotado";
     return `
       <div class="ab-wrap">
-        <div class="ab-row ${rowClass}" data-index="${i}" role="button" tabindex="0" aria-label="Ver detalle de ${p.name}">
+        <div class="ab-row ${rowClass}">
           <figure class="ab-photo" style="margin:0;">
-            <img src="${productImages(p)[0]}" alt="Foto de ${p.name}">
+            <img src="${placeholder}" alt="Foto de ${p.name}">
           </figure>
           <div>
             <div style="display:flex;align-items:center;gap:var(--space-3);margin-bottom:var(--space-3);">
@@ -68,7 +68,7 @@ function render() {
             <p style="font-size:15.5px;line-height:1.65;max-width:42ch;margin:var(--space-4) 0 0;color:color-mix(in srgb,var(--color-text) 78%,transparent);">${p.desc}</p>
             <p style="font-size:13px;margin:var(--space-3) 0 0;color:color-mix(in srgb,var(--color-text) 58%,transparent);">Medidas: ${p.medidas}</p>
             <p style="font-family:var(--font-heading);font-weight:var(--font-heading-weight);font-size:26px;color:var(--color-accent-700);margin:var(--space-5) 0 0;">${formatPrice(p.price)}</p>
-            <a href="${url}" target="_blank" rel="noopener" class="btn btn-secondary js-wa-link" style="margin-top:var(--space-5);display:inline-flex;">Consultar por WhatsApp</a>
+            <a href="${url}" target="_blank" rel="noopener" class="btn btn-secondary" style="margin-top:var(--space-5);display:inline-flex;">Consultar por WhatsApp</a>
           </div>
         </div>
         <hr class="hr">

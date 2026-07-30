@@ -4,7 +4,20 @@
   --color-accent-100: color-mix(in oklch, #a9822f 10%, white);
   --color-accent-300: color-mix(in oklch, #a9822f 35%, white);
   --color-accent-700: color-mix(in oklch, #a9822f 68%, black);
-  --color-divider: color-mix(in oklch, #a9822f 35%, var(--color-neutral-300));
+  --color-divider: color-mix(in oklch, #a9822f 25%, var(--color-neutral-300));
+
+  /* — segundo color de marca: verde botella, para dar riqueza sin competir
+     con el dorado. Se apoya en el sistema de tags/accent-2 del design system. — */
+  --color-accent-2: #3c5a45;
+  --color-accent-2-100: color-mix(in oklch, #3c5a45 10%, white);
+  --color-accent-2-200: color-mix(in oklch, #3c5a45 20%, white);
+  --color-accent-2-300: color-mix(in oklch, #3c5a45 35%, white);
+  --color-accent-2-400: color-mix(in oklch, #3c5a45 55%, white);
+  --color-accent-2-500: #3c5a45;
+  --color-accent-2-600: color-mix(in oklch, #3c5a45 85%, black);
+  --color-accent-2-700: color-mix(in oklch, #3c5a45 68%, black);
+  --color-accent-2-800: color-mix(in oklch, #3c5a45 45%, black);
+  --color-accent-2-900: color-mix(in oklch, #3c5a45 25%, black);
 }
 body { margin: 0; text-wrap: pretty; background: var(--color-bg); color: var(--color-text); font-family: var(--font-body); }
 a { color: var(--color-accent-700); text-decoration: none; }
@@ -37,6 +50,7 @@ a:hover { color: var(--color-accent); text-decoration: underline; }
 /* el link de WhatsApp dentro de la card no debe heredar el cursor "abrir modal" de forma confusa */
 .ab-row .js-wa-link { cursor: pointer; }
 
+.product-band.tint { background: var(--color-accent-2-100); }
 /* — hero — */
 .ab-hero {
   position: relative;
