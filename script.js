@@ -4,22 +4,26 @@ const SALUDO = "Hola! Me interesa esta cartera:";
 const products = [
   // Tip: para cargar fotos reales de cada cartera, agregá un array "images"
   // con las rutas de tus fotos, por ejemplo:
-  //   images: ["assets/mora-1.jpg", "assets/mora-2.jpg", "assets/mora-3.jpg"]
+  //   images: ["assets/megan-1.jpg", "assets/megan-2.jpg", "assets/megan-3.jpg"]
   // Si un producto no tiene "images", se usa el dibujo placeholder.
-  { name: "Cartera Mora", price: 34000, desc: "Cuero sintético texturado con solapa y cierre imán.", medidas: "26 x 18 x 9 cm", stock: true },
-  { name: "Cartera Ámbar", price: 38500, desc: "Bandolera estructurada con correa regulable.", medidas: "24 x 16 x 8 cm", stock: true },
-  { name: "Bandolera Luna", price: 29900, desc: "Diseño acolchado, correa cadena metálica.", medidas: "22 x 14 x 7 cm", stock: true },
-  { name: "Cartera Sol", price: 42000, desc: "Tote amplio con doble manija, ideal día a día.", medidas: "32 x 24 x 12 cm", stock: false },
-  { name: "Clutch Noche", price: 26500, desc: "Sobre de mano con cierre broche, uso de fiesta.", medidas: "20 x 12 x 4 cm", stock: true },
-  { name: "Tote Lino", price: 33900, desc: "Cuerpo texturizado tipo lino, base reforzada.", medidas: "30 x 22 x 10 cm", stock: true },
-  { name: "Cartera Terra", price: 36700, desc: "Cuero tostado con costuras a la vista.", medidas: "27 x 19 x 9 cm", stock: true },
-  { name: "Bandolera Arena", price: 28900, desc: "Compacta, ideal para lo esencial.", medidas: "20 x 15 x 6 cm", stock: true },
-  { name: "Mini Bag Rosa", price: 24900, desc: "Formato mini con cadena dorada desmontable.", medidas: "16 x 12 x 6 cm", stock: false },
-  { name: "Cartera Cobre", price: 39900, desc: "Estructura rígida, cierre cremallera superior.", medidas: "28 x 20 x 10 cm", stock: true },
-  { name: "Tote Urbano", price: 31500, desc: "Bolso tote de lona reforzada con bolsillo interno.", medidas: "34 x 26 x 12 cm", stock: true },
-  { name: "Cartera Bruma", price: 35200, desc: "Tono neutro, apta para looks formales.", medidas: "25 x 17 x 8 cm", stock: true },
-  { name: "Clutch Dorado", price: 27800, desc: "Detalle metálico, correa cadena fina extraíble.", medidas: "21 x 13 x 5 cm", stock: true },
-  { name: "Bandolera Nude", price: 30400, desc: "Línea minimalista, correa ajustable en 3 alturas.", medidas: "23 x 16 x 7 cm", stock: true }
+  { name: "Bag Megan", code: "Cod1", price: 40000, desc: "Diseño moderno y detalles protagonistas, esta cartera está pensada para quienes buscan un accesorio característico. Amplia, cómoda y fácil de combinar.", medidas: "39 x 18 x 11 cm", stock: true, images: ["assets/megan-1.jpg", "assets/megan-2.jpg", "assets/megan-3.jpg"] },
+  { name: "Bag Tini", code: "Cod2", price: 40000, desc: "La mini bag ideal para destacar con sutileza. Sus detalles crean el equilibrio perfecto entre estilo y funcionalidad.", medidas: "23 x 14 x 9 cm", stock: true, images: ["assets/tini-1.jpg", "assets/tini-2.jpg", "assets/tini-3.jpg", "assets/tini-4.jpg", "assets/tini-5.jpg"] },
+  { name: "Bag Lola", code: "Cod3", price: 36000, desc: "Una pieza versátil que destaca por su diseño sofisticado y moderno, clave para combinar fácilmente con cualquier outfit.", medidas: "26 x 15 x 7 cm", stock: true, images: ["assets/lola-1.jpg", "assets/lola-2.jpg", "assets/lola-3.jpg"] },
+  { name: "Bag Mery (rosa)", code: "Cod4", price: 38000, desc: "La combinación ideal entre comodidad y tendencia. Un accesorio pensado para acompañarte todos los días.", medidas: "20 x 12 x 8 cm", stock: true, images: ["assets/mery-rosa-1.png", "assets/mery-rosa-2.jpg", "assets/mery-rosa-3.jpg", "assets/mery-rosa-4.jpg", "assets/mery-rosa-5.jpg", "assets/mery-rosa-6.jpg"] },
+  { name: "Bag Val (beige)", code: "Cod5", price: 58000, desc: "Un clásico renovado con un diseño moderno y sofisticado. Es la cartera ideal para acompañarte desde la mañana hasta la noche con total comodidad, aportando elegancia y practicidad. Incluye traba (ideal para salir de noche).", medidas: "19 x 18 x 9 cm", stock: true, images: ["assets/val-beige-1.jpg", "assets/val-beige-2.jpg", "assets/val-beige-3.jpg", "assets/val-beige-4.jpg", "assets/val-beige-5.jpg"] },
+  { name: "Bag Val (negra)", code: "Cod6", price: 58000, desc: "Un clásico renovado con un diseño moderno y sofisticado. Es la cartera ideal para acompañarte desde la mañana hasta la noche con total comodidad, aportando elegancia y practicidad. Incluye traba (ideal para salir de noche).", medidas: "19 x 18 x 9 cm", stock: true, images: ["assets/val-negra-1.jpg", "assets/val-negra-2.jpg", "assets/val-negra-3.jpg", "assets/val-negra-4.jpg", "assets/val-negra-5.jpg"] },
+  { name: "Bag Juli", code: "Cod7", price: 36000, desc: "Pensada para quienes valoran los detalles, esta bag definitivamente te hará destacar.", medidas: "24 x 14 x 7 cm", stock: false, images: ["assets/juli-1.jpg", "assets/juli-2.jpg", "assets/juli-3.jpg", "assets/juli-4.jpg"] },
+  { name: "Bag Cherry", code: "Cod8", price: 32000, desc: "Diseño delicado y minimalista, ofrece el espacio perfecto para llevar tus esenciales con total comodidad sin perder estilo.", medidas: "27 x 16 x 9 cm", stock: true, images: ["assets/cherry-1.jpg", "assets/cherry-2.jpg", "assets/cherry-3.jpg", "assets/cherry-4.jpg"] },
+  { name: "Bag Diamond (borgoña)", code: "Cod9", price: 44000, desc: "Un diseño que transmite elegancia desde cada ángulo. Ideal para complementar cualquier outfit con un toque distinguido.", medidas: "31 x 22 x 10 cm", stock: true, images: ["assets/diamond-borgona-1.png", "assets/diamond-borgona-2.jpg", "assets/diamond-borgona-3.jpg"] },
+  { name: "Bag Diamond (negra)", code: "Cod10", price: 44000, desc: "Un diseño que transmite elegancia desde cada ángulo. Ideal para complementar cualquier outfit con un toque distinguido.", medidas: "31 x 22 x 10 cm", stock: true, images: ["assets/diamond-negra-1.jpg", "assets/diamond-negra-2.jpg", "assets/diamond-negra-3.jpg"] },
+  { name: "Bag Classic", code: "Cod11", price: 38000, desc: "Clásica, amplia y fácil de combinar. Una cartera pensada para convertirse en tu compañera favorita en cualquier ocasión.", medidas: "34 x 18 x 12 cm", stock: false, images: ["assets/classic-1.png", "assets/classic-2.jpg", "assets/classic-3.jpg", "assets/classic-4.jpg"] },
+  { name: "Bolso Wine", code: "Cod12", price: 42000, desc: "Es la tote bag perfecta si buscas amplitud, comodidad y estilo. Perfecta para destacar con sutileza.", medidas: "32 x 26 x 11 cm", stock: true, images: ["assets/wine-1.jpg", "assets/wine-2.jpg", "assets/wine-3.jpg"] },
+  { name: "Bag Mery (beige)", code: "Cod13", price: 38000, desc: "La combinación ideal entre comodidad y tendencia. Un accesorio pensado para acompañarte todos los días.", medidas: "20 x 12 x 8 cm", stock: true, images: ["assets/mery-beige-1.png", "assets/mery-beige-2.jpg", "assets/mery-beige-3.jpg", "assets/mery-beige-4.jpg", "assets/mery-beige-5.jpg"] },
+  { name: "Bag Emilia", code: "Cod14", price: 32000, desc: "Pequeña en tamaño, pero protagonista en estilo. Una mini bag versátil que complementa cualquier outfit con un toque sofisticado.", medidas: "20 x 13 x 11 cm", stock: true, images: ["assets/emilia-1.jpg", "assets/emilia-2.jpg", "assets/emilia-3.jpg", "assets/emilia-4.jpg", "assets/emilia-5.jpg"] },
+  { name: "Bag Fancy", code: "Cod15", price: 38000, desc: "Un diseño atemporal que combina amplitud, comodidad y sofisticación. Opción ideal para acompañarte todos los días con un estilo elegante.", medidas: "30 x 25 x 14 cm", stock: true, images: ["assets/fancy-1.png", "assets/fancy-2.png"] },
+  { name: "Bag Miley", code: "Cod16", price: 32000, desc: "Pensada para quienes aman los accesorios con actitud. Su diseño con hebillas hace de esta cartera el complemento perfecto para elevar cualquier look.", medidas: "39 x 22 x 8 cm", stock: true, images: ["assets/miley-1.jpg", "assets/miley-2.jpg", "assets/miley-3.jpg"] },
+  { name: "Bag Mora (beige)", code: "Cod17", price: 30000, desc: "Una bag más informal, pero sin dejar de brindar estilo. Planeada para acompañarte en cualquier ocasión, sus compartimentos la hacen práctica y cómoda.", medidas: "24 x 20 x 8 cm", stock: true, images: ["assets/mora-beige-1.jpg", "assets/mora-beige-2.jpg", "assets/mora-beige-3.jpg"] },
+  { name: "Bag Mora (negra)", code: "Cod18", price: 30000, desc: "Una bag más informal, pero sin dejar de brindar estilo. Planeada para acompañarte en cualquier ocasión, sus compartimentos la hacen práctica y cómoda.", medidas: "24 x 20 x 8 cm", stock: true, images: ["assets/mora-negra-1.jpg", "assets/mora-negra-2.jpg", "assets/mora-negra-3.jpg"] }
 ];
 
 function formatPrice(n) { return "$" + Math.round(n).toLocaleString("es-AR"); }
@@ -60,15 +64,19 @@ function render() {
           <figure class="ab-photo" style="margin:0;">
             <img src="${thumb}" alt="Foto de ${p.name}">
           </figure>
-          <div>
-            <div style="display:flex;align-items:center;gap:var(--space-3);margin-bottom:var(--space-3);">
+          <div class="ab-info">
+            <div class="ab-tag-row" style="display:flex;align-items:center;gap:var(--space-3);margin-bottom:var(--space-3);">
               <span class="tag ${tagClass}">${stockLabel}</span>
             </div>
-            <h2 style="font-family:var(--font-heading);font-weight:var(--font-heading-weight);font-size:clamp(26px,3vw,36px);letter-spacing:0;margin:0;">${p.name}</h2>
-            <p style="font-size:15.5px;line-height:1.65;max-width:42ch;margin:var(--space-4) 0 0;color:color-mix(in srgb,var(--color-text) 78%,transparent);">${p.desc}</p>
-            <p style="font-size:13px;margin:var(--space-3) 0 0;color:color-mix(in srgb,var(--color-text) 58%,transparent);">Medidas: ${p.medidas}</p>
-            <p style="font-family:var(--font-heading);font-weight:var(--font-heading-weight);font-size:26px;color:var(--color-accent-700);margin:var(--space-5) 0 0;">${formatPrice(p.price)}</p>
-            <a href="${url}" target="_blank" rel="noopener" class="btn btn-secondary js-wa-link" style="margin-top:var(--space-5);display:inline-flex;">Consultar por WhatsApp</a>
+            <h2 class="ab-title" style="font-family:var(--font-heading);font-weight:var(--font-heading-weight);font-size:clamp(26px,3vw,36px);letter-spacing:0;margin:0;">${p.name}</h2>
+            <p class="ab-desc" style="font-size:15.5px;line-height:1.65;max-width:42ch;margin:var(--space-4) 0 0;color:color-mix(in srgb,var(--color-text) 78%,transparent);">${p.desc}</p>
+            <p class="ab-medidas" style="font-size:13px;margin:var(--space-3) 0 0;color:color-mix(in srgb,var(--color-text) 58%,transparent);">Medidas: ${p.medidas}</p>
+            <p class="ab-price" style="font-family:var(--font-heading);font-weight:var(--font-heading-weight);font-size:26px;color:var(--color-accent-700);margin:var(--space-5) 0 0;">${formatPrice(p.price)}</p>
+            <a href="${url}" target="_blank" rel="noopener" class="btn btn-secondary js-wa-link ab-wa-btn" style="margin-top:var(--space-5);display:inline-flex;">Consultar por WhatsApp</a>
+            <div class="ab-mobile-more" aria-hidden="true">
+              Ver detalle
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            </div>
           </div>
         </div>
         <hr class="hr">

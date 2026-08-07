@@ -32,30 +32,26 @@
 
 <section class="ab-hero">
   <div class="ab-hero-deco" aria-hidden="true">
-    <svg viewBox="0 0 400 400" width="100%" height="100%">
-      <circle cx="270" cy="150" r="150" fill="var(--color-accent-100)"/>
-      <circle cx="230" cy="230" r="96" fill="none" stroke="var(--color-accent-2-300)" stroke-width="1.5"/>
-      <path d="M150 118 v-16 a34 34 0 0 1 68 0 v16" fill="none" stroke="var(--color-accent-700)" stroke-width="3" stroke-linecap="round"/>
-      <rect x="115" y="118" width="138" height="118" rx="6" fill="var(--color-bg)" stroke="var(--color-accent-700)" stroke-width="3"/>
-      <line x1="115" y1="152" x2="253" y2="152" stroke="var(--color-accent-2-500)" stroke-width="2"/>
-      <rect x="172" y="139" width="24" height="18" rx="2" fill="none" stroke="var(--color-accent-700)" stroke-width="2.5"/>
-    </svg>
+    <img src="logoaureatransparent.png" alt="" style="width:100%;height:100%;object-fit:contain;display:block;">
   </div>
   <div class="ab-wrap ab-hero-inner">
-    <span class="ab-hero-in" style="display:block;font-size:13px;letter-spacing:0.14em;text-transform:uppercase;color:var(--color-accent-700);margin:0 0 var(--space-4);animation-delay:.05s;">Colección permanente</span>
+    <span class="ab-hero-in" style="display:block;font-size:13px;letter-spacing:0.14em;text-transform:uppercase;color:var(--color-accent-700);margin:0 0 var(--space-4);animation-delay:.05s;">Colección Girlie</span>
     <h1 class="ab-hero-in" style="font-family:var(--font-heading);font-weight:var(--font-heading-weight);font-size:clamp(40px,6.5vw,84px);line-height:1.02;letter-spacing:0;margin:0;max-width:15ch;animation-delay:.15s;">Carteras que acompañan cada versión tuya.</h1>
-    <p class="ab-hero-in" style="font-size:18px;line-height:1.7;max-width:52ch;margin:var(--space-6) 0 0;color:color-mix(in srgb,var(--color-text) 75%,transparent);animation-delay:.28s;">Un catálogo curado, pieza por pieza. Elegí la tuya y escribinos por WhatsApp para coordinar la compra.</p>
+    <p class="ab-hero-in ab-hero-desc" style="font-size:18px;line-height:1.7;max-width:52ch;margin:var(--space-6) 0 0;color:color-mix(in srgb,var(--color-text) 75%,transparent);animation-delay:.28s;">Un catálogo elegido para quienes buscan carteras que combinen estilo, calidad y personalidad. Elegí tu próxima cartera favorita y escribinos por WhatsApp para coordinar la compra.</p>
     <a href="#catalogo" class="btn btn-primary ab-hero-in" style="margin-top:var(--space-6);animation-delay:.4s;">Ver colección</a>
   </div>
 </section>
 
 <hr class="hr">
 
-<section id="catalogo" style="padding:var(--space-4) 0;">
-  <div class="ab-wrap" style="padding-top:clamp(32px,5vw,56px);">
+<section id="catalogo" style="padding:var(--space-4) 0;position:relative;">
+  <div class="ab-catalogo-deco" aria-hidden="true">
+    <img src="logoaureatransparent.png" alt="" style="width:100%;height:100%;object-fit:contain;display:block;">
+  </div>
+  <div class="ab-wrap" style="padding-top:clamp(32px,5vw,56px);position:relative;z-index:1;">
     <span style="display:block;font-size:13px;letter-spacing:0.14em;text-transform:uppercase;color:var(--color-accent-700);">Catálogo completo</span>
   </div>
-  <div id="catalogo-list"></div>
+  <div id="catalogo-list" style="position:relative;z-index:1;"></div>
 </section>
 
 <section class="ab-wrap" id="envios" style="padding:clamp(56px,8vw,96px) 0;">
