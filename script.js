@@ -63,6 +63,10 @@ function render() {
         <div class="ab-row ${rowClass}" data-index="${i}" tabindex="0" role="button" aria-haspopup="dialog" aria-label="Ver detalle de ${p.name}">
           <figure class="ab-photo" style="margin:0;">
             <img src="${thumb}" alt="Foto de ${p.name}">
+            <span class="ab-photo-cue" aria-hidden="true">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+              Ver más
+            </span>
           </figure>
           <div class="ab-info">
             <div class="ab-tag-row" style="display:flex;align-items:center;gap:var(--space-3);margin-bottom:var(--space-3);">
