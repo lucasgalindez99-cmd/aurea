@@ -389,19 +389,65 @@ a:hover { color: var(--color-accent); text-decoration: underline; }
 .ab-modal-wa-btn svg { flex: none; }
 
 /* ————————————————————————————————————————————
+   Entregas (envío y entrega)
+   ———————————————————————————————————————————— */
+.ab-entregas {
+  position: relative;
+  overflow: hidden;
+  background: var(--color-accent-2-100);
+  padding: clamp(56px,8vw,96px) 0;
+}
+.ab-entregas-deco {
+  position: absolute;
+  top: 50%; right: clamp(-40px, 4vw, 20px);
+  transform: translateY(-50%);
+  width: clamp(220px, 24vw, 360px);
+  aspect-ratio: 1 / 1;
+  opacity: 0.08;
+  pointer-events: none;
+}
+.ab-entregas-inner { position: relative; z-index: 1; max-width: 640px; }
+.ab-entregas-eyebrow {
+  display: block;
+  font-size: 13px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-accent-2-700);
+  margin: 0 0 var(--space-4);
+}
+.ab-entregas-title {
+  font-family: var(--font-heading);
+  font-weight: var(--font-heading-weight);
+  font-style: normal;
+  font-size: clamp(26px, 3vw, 36px);
+  line-height: 1.15;
+  letter-spacing: 0;
+  margin: 0;
+}
+.ab-entregas-desc {
+  font-size: 16px;
+  line-height: 1.7;
+  margin: var(--space-4) 0 0;
+  color: color-mix(in srgb, var(--color-text) 75%, transparent);
+}
+.ab-entregas-btn {
+  margin-top: var(--space-6);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--color-accent-2-700) !important;
+}
+.ab-entregas-btn:hover { background: var(--color-accent-2-800) !important; }
+.ab-entregas-btn svg { flex: none; }
+
+@media (max-width: 560px) {
+  .ab-entregas-deco { width: 60vw; opacity: 0.07; right: -12vw; }
+}
+
+/* ————————————————————————————————————————————
    Footer social (Instagram / WhatsApp)
    ———————————————————————————————————————————— */
 .ab-footer { position: relative; overflow: hidden; }
-.ab-footer-deco {
-  position: absolute;
-  top: 50%; left: 50%;
-  transform: translate(-50%, -50%);
-  width: min(70vw, 480px);
-  aspect-ratio: 1 / 1;
-  opacity: 0.14;
-  pointer-events: none;
-}
-.ab-footer-deco img { width: 100%; height: 100%; object-fit: contain; display: block; }
 .ab-footer-inner { position: relative; z-index: 1; text-align: center; }
 .ab-footer-word {
   font-family: var(--font-heading);

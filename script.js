@@ -265,6 +265,13 @@ function setupProductModal() {
   });
 }
 
+function setupEntregasLink() {
+  const wa = document.getElementById("entregasWaLink");
+  if (!wa) return;
+  const msg = "Hola! Quiero coordinar la entrega de mi pedido en Código Capital";
+  wa.href = "https://wa.me/" + WHATSAPP_NUMBER.replace(/[^0-9]/g, "") + "?text=" + encodeURIComponent(msg);
+}
+
 function setupFooterLinks() {
   const wa = document.getElementById("footerWaLink");
   if (!wa) return;
@@ -276,5 +283,6 @@ document.addEventListener("DOMContentLoaded", () => {
   render();
   setupNav();
   setupProductModal();
+  setupEntregasLink();
   setupFooterLinks();
 });
