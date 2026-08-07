@@ -75,12 +75,14 @@ function render() {
             <h2 class="ab-title" style="font-family:var(--font-heading);font-weight:var(--font-heading-weight);font-size:clamp(26px,3vw,36px);letter-spacing:0;margin:0;">${p.name}</h2>
             <p class="ab-desc" style="font-size:15.5px;line-height:1.65;max-width:42ch;margin:var(--space-4) 0 0;color:color-mix(in srgb,var(--color-text) 78%,transparent);">${p.desc}</p>
             <p class="ab-medidas" style="font-size:13px;margin:var(--space-3) 0 0;color:color-mix(in srgb,var(--color-text) 58%,transparent);">Medidas: ${p.medidas}</p>
-            <p class="ab-price" style="font-family:var(--font-heading);font-weight:var(--font-heading-weight);font-size:26px;color:var(--color-accent-700);margin:var(--space-5) 0 0;">${formatPrice(p.price)}</p>
-            <a href="${url}" target="_blank" rel="noopener" class="btn btn-secondary js-wa-link ab-wa-btn" style="margin-top:var(--space-5);display:inline-flex;">Consultar por WhatsApp</a>
-            <div class="ab-mobile-more" aria-hidden="true">
-              Ver detalle
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            <div class="ab-meta-row">
+              <p class="ab-price" style="font-family:var(--font-heading);font-weight:var(--font-heading-weight);font-size:26px;color:var(--color-accent-700);margin:var(--space-5) 0 0;">${formatPrice(p.price)}</p>
+              <div class="ab-mobile-more" aria-hidden="true">
+                Ver detalle
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+              </div>
             </div>
+            <a href="${url}" target="_blank" rel="noopener" class="btn btn-secondary js-wa-link ab-wa-btn" style="margin-top:var(--space-5);display:inline-flex;">Consultar por WhatsApp</a>
           </div>
         </div>
         <hr class="hr">

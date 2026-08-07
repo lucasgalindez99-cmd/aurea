@@ -1,9 +1,10 @@
-@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&display=swap');
 
 :root {
   --font-heading: 'Manrope', -apple-system, sans-serif;
   --font-heading-weight: 700;
   --font-body: 'Inter', -apple-system, sans-serif;
+  --font-product: 'Fraunces', serif;
 
   --color-bg: #faf5ea;
   --color-accent: #a9822f;
@@ -33,6 +34,11 @@ a:hover { color: var(--color-accent); text-decoration: underline; }
 .ab-row.rev .ab-photo { order: 2; }
 .ab-photo { aspect-ratio: 4/5; background: var(--color-accent-100); overflow: hidden; position: relative; }
 .ab-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.ab-title {
+  font-family: var(--font-product);
+  font-weight: 500;
+  font-style: italic;
+}
 .ab-mobile-more { display: none; }
 .ab-photo-cue { display: none; }
 @media (max-width: 760px) {
@@ -55,10 +61,19 @@ a:hover { color: var(--color-accent); text-decoration: underline; }
   .ab-title, .ab-price, .ab-mobile-more { position: relative; z-index: 1; }
   .ab-tag-row, .ab-desc, .ab-medidas, .ab-wa-btn { display: none !important; }
   .ab-title { font-size: 19px !important; }
-  .ab-price { font-size: 18px !important; margin-top: var(--space-2) !important; }
+  .ab-price { font-size: 18px !important; margin: 0 !important; }
+  .ab-meta-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-3);
+    margin-top: var(--space-3);
+  }
   .ab-mobile-more {
     display: flex; align-items: center; justify-content: center; gap: 5px;
-    margin-top: var(--space-3);
+    margin-top: 0;
+    padding-left: var(--space-3);
+    border-left: 1px solid var(--color-divider);
     font-size: 13px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase;
     color: var(--color-accent-2-700);
   }
@@ -326,8 +341,9 @@ a:hover { color: var(--color-accent); text-decoration: underline; }
 
 .ab-modal-info { display: flex; flex-direction: column; min-width: 0; }
 .ab-modal-info h2 {
-  font-family: var(--font-heading);
-  font-weight: var(--font-heading-weight);
+  font-family: var(--font-product);
+  font-weight: 500;
+  font-style: italic;
   font-size: clamp(24px, 2.6vw, 32px);
   margin: var(--space-3) 0 0;
   letter-spacing: 0;
@@ -336,6 +352,12 @@ a:hover { color: var(--color-accent); text-decoration: underline; }
   margin: var(--space-3) 0 0;
   font-size: 15px;
   line-height: 1.6;
+}
+
+.ab-desc,
+.ab-modal-info p#abModalDesc {
+  text-align: justify;
+  text-justify: inter-word;
 }
 #abModalPrice {
   font-family: var(--font-heading);
