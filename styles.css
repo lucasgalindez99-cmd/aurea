@@ -1,4 +1,10 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap');
+
 :root {
+  --font-heading: 'Manrope', -apple-system, sans-serif;
+  --font-heading-weight: 700;
+  --font-body: 'Inter', -apple-system, sans-serif;
+
   --color-bg: #faf5ea;
   --color-accent: #a9822f;
   --color-accent-100: color-mix(in oklch, #a9822f 10%, white);
@@ -148,7 +154,7 @@ a:hover { color: var(--color-accent); text-decoration: underline; }
   white-space: nowrap;
 }
 .nav-word em {
-  font-style: italic;
+  font-style: normal;
   font-weight: 400;
   color: var(--color-accent);
   margin-left: 0.32em;
@@ -383,7 +389,7 @@ a:hover { color: var(--color-accent); text-decoration: underline; }
   margin: 0 0 6px;
 }
 .ab-footer-word em {
-  font-style: italic;
+  font-style: normal;
   font-weight: 400;
   color: var(--color-accent-300);
   margin-left: 0.32em;
