@@ -1,4 +1,4 @@
-const WHATSAPP_NUMBER = "549XXXXXXXXXX"; // reemplazá por tu número con código de país
+const WHATSAPP_NUMBER = "5493517012317"; // reemplazá por tu número con código de país
 const SALUDO = "Hola! Me interesa esta cartera:";
 
 const products = [
