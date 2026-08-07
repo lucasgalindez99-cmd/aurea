@@ -25,46 +25,38 @@ a:hover { color: var(--color-accent); text-decoration: underline; }
 .ab-wrap { max-width: 1180px; margin: 0 auto; padding: 0 clamp(20px, 6vw, 72px); }
 .ab-row { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: clamp(28px,5vw,88px); align-items: center; padding: clamp(48px,7vw,96px) 0; }
 .ab-row.rev .ab-photo { order: 2; }
-.ab-photo { aspect-ratio: 4/5; background: var(--color-accent-100); overflow: hidden; }
+.ab-photo { aspect-ratio: 4/5; background: var(--color-accent-100); overflow: hidden; position: relative; }
 .ab-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.ab-mobile-more { display: none; }
+.ab-photo-cue { display: none; }
 @media (max-width: 760px) {
   .ab-row, .ab-row.rev { grid-template-columns: 1fr; }
   .ab-row.rev .ab-photo { order: 0; }
   .ab-photo { width: 74%; margin: 0 auto var(--space-3) !important; aspect-ratio: 4/5; }
-  .ab-photo-cue {
-    display: flex; align-items: center; gap: 4px;
-    position: absolute; right: 10px; bottom: 10px;
-    background: color-mix(in srgb, var(--color-text) 78%, transparent);
-    color: var(--color-bg);
-    font-size: 11px; letter-spacing: 0.02em;
-    padding: 6px 11px; border-radius: 20px;
-  }
-  .ab-info { text-align: center; position: relative; }
+  .ab-info { text-align: center; position: relative; overflow: hidden; }
   .ab-info::before {
     content: "";
     position: absolute;
-    top: -6px; left: 50%;
-    transform: translateX(-50%);
-    width: 150px; height: 150px;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: min(85vw, 320px);
+    height: min(85vw, 320px);
     background: url('logoaureatransparent.png?v=2') center / contain no-repeat;
-    opacity: 0.07;
+    opacity: 0.09;
     pointer-events: none;
+    z-index: 0;
   }
-  .ab-title, .ab-price, .ab-mobile-more { position: relative; }
+  .ab-title, .ab-price, .ab-mobile-more { position: relative; z-index: 1; }
   .ab-tag-row, .ab-desc, .ab-medidas, .ab-wa-btn { display: none !important; }
   .ab-title { font-size: 19px !important; }
   .ab-price { font-size: 18px !important; margin-top: var(--space-2) !important; }
   .ab-mobile-more {
-    display: flex; align-items: center; justify-content: center; gap: 4px;
-    margin-top: var(--space-3); padding-top: var(--space-3);
-    border-top: 1px solid var(--color-divider);
-    font-size: 11px; letter-spacing: 0.04em; text-transform: uppercase;
+    display: flex; align-items: center; justify-content: center; gap: 5px;
+    margin-top: var(--space-3);
+    font-size: 13px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase;
     color: var(--color-accent-2-700);
   }
 }
-.ab-mobile-more { display: none; }
-.ab-photo-cue { display: none; }
-.ab-photo { position: relative; }
 
 /* — product card is clickable (opens modal) — */
 .ab-row {
@@ -108,7 +100,13 @@ a:hover { color: var(--color-accent); text-decoration: underline; }
   .ab-hero-deco { width: clamp(280px, 68vw, 460px); opacity: 0.13; right: -30px; }
 }
 @media (max-width: 560px) {
-  .ab-hero-deco { display: none; }
+  .ab-hero-deco {
+    display: block;
+    top: 50%; left: auto; right: -18vw;
+    transform: translateY(-50%);
+    width: 78vw;
+    opacity: 0.08;
+  }
   .ab-hero-desc { display: none; }
 }
 
@@ -340,7 +338,86 @@ a:hover { color: var(--color-accent); text-decoration: underline; }
   color: var(--color-accent-700);
   margin-top: var(--space-4);
 }
+#abModalPrice .ab-currency {
+  font-family: var(--font-body);
+  font-size: 0.55em;
+  font-weight: 600;
+  vertical-align: 0.18em;
+  margin-right: 3px;
+  opacity: 0.82;
+}
 .ab-modal-info .btn {
   margin-top: var(--space-5);
   align-self: flex-start;
+}
+.ab-modal-wa-btn {
+  border: 1.5px solid var(--color-accent-700) !important;
+  background: transparent !important;
+  color: var(--color-accent-700) !important;
+}
+.ab-modal-wa-btn:hover {
+  background: color-mix(in srgb, var(--color-accent) 8%, transparent) !important;
+}
+.ab-modal-wa-btn svg { flex: none; }
+
+/* ————————————————————————————————————————————
+   Footer social (Instagram / WhatsApp)
+   ———————————————————————————————————————————— */
+.ab-footer { position: relative; overflow: hidden; }
+.ab-footer-deco {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: min(70vw, 480px);
+  aspect-ratio: 1 / 1;
+  opacity: 0.14;
+  pointer-events: none;
+}
+.ab-footer-deco img { width: 100%; height: 100%; object-fit: contain; display: block; }
+.ab-footer-inner { position: relative; z-index: 1; text-align: center; }
+.ab-footer-word {
+  font-family: var(--font-heading);
+  font-weight: var(--font-heading-weight);
+  font-size: clamp(22px, 2.6vw, 28px);
+  letter-spacing: 0.03em;
+  margin: 0 0 6px;
+}
+.ab-footer-word em {
+  font-style: italic;
+  font-weight: 400;
+  color: var(--color-accent-300);
+  margin-left: 0.32em;
+}
+.ab-footer-tagline {
+  font-size: 13px;
+  color: color-mix(in srgb, var(--color-bg) 75%, transparent);
+  margin: 0 0 var(--space-6);
+}
+.ab-footer-social-row {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-4);
+  margin-bottom: var(--space-6);
+}
+.ab-footer-icon {
+  width: 42px; height: 42px;
+  border-radius: 50%;
+  border: 1px solid color-mix(in srgb, var(--color-bg) 45%, transparent);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--color-bg);
+  transition: background .15s ease, border-color .15s ease;
+}
+.ab-footer-icon:hover {
+  background: color-mix(in srgb, var(--color-bg) 12%, transparent);
+  border-color: var(--color-bg);
+}
+.ab-footer-icon svg { display: block; }
+.ab-footer-bottom {
+  border-top: 1px solid color-mix(in srgb, var(--color-bg) 20%, transparent);
+  padding-top: var(--space-4);
+}
+.ab-footer-bottom p {
+  font-size: 11px;
+  color: color-mix(in srgb, var(--color-bg) 60%, transparent);
+  margin: 0;
 }

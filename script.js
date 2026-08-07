@@ -146,7 +146,10 @@ function buildModal() {
         <p id="abModalDesc"></p>
         <p id="abModalMedidas" class="text-muted"></p>
         <p id="abModalPrice"></p>
-        <a id="abModalWA" href="#" target="_blank" rel="noopener" class="btn btn-primary">Consultar por WhatsApp</a>
+        <a id="abModalWA" href="#" target="_blank" rel="noopener" class="btn btn-secondary ab-modal-wa-btn">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.28-1.38a9.9 9.9 0 0 0 4.76 1.21h.01c5.46 0 9.9-4.45 9.9-9.91C21.96 6.45 17.51 2 12.04 2zm5.8 14.03c-.24.68-1.4 1.3-1.93 1.36-.5.06-1.06.09-1.72-.11-.4-.12-.9-.29-1.56-.57-2.74-1.18-4.53-3.94-4.67-4.13-.14-.19-1.11-1.48-1.11-2.82s.7-2.01.95-2.28c.24-.27.53-.34.71-.34l.51.01c.16 0 .38-.06.6.46.22.53.75 1.83.82 1.96.07.14.11.3.02.48-.09.19-.13.3-.26.46-.13.16-.28.36-.4.48-.13.13-.27.28-.12.55.16.27.7 1.16 1.51 1.88 1.04.93 1.91 1.22 2.19 1.36.28.14.44.12.6-.07.16-.19.68-.79.86-1.06.18-.27.36-.22.6-.13.24.09 1.53.72 1.79.85.27.13.44.2.51.31.06.11.06.65-.18 1.33z"/></svg>
+          Consultar por WhatsApp
+        </a>
       </div>
     </div>`;
   document.body.appendChild(wrap);
@@ -223,7 +226,7 @@ function openModal(index, triggerEl) {
   modalEls.title.textContent = p.name;
   modalEls.desc.textContent = p.desc;
   modalEls.medidas.textContent = "Medidas: " + p.medidas;
-  modalEls.price.textContent = formatPrice(p.price);
+  modalEls.price.innerHTML = `<span class="ab-currency">$</span>` + Math.round(p.price).toLocaleString("es-AR");
   modalEls.wa.href = whatsappUrl(p);
 
   renderImage();
@@ -260,8 +263,16 @@ function setupProductModal() {
   });
 }
 
+function setupFooterLinks() {
+  const wa = document.getElementById("footerWaLink");
+  if (!wa) return;
+  const msg = "Hola! Quiero consultar por el catálogo de Áurea Bags";
+  wa.href = "https://wa.me/" + WHATSAPP_NUMBER.replace(/[^0-9]/g, "") + "?text=" + encodeURIComponent(msg);
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   render();
   setupNav();
   setupProductModal();
+  setupFooterLinks();
 });
