@@ -6,11 +6,11 @@ const products = [
   // con las rutas de tus fotos, por ejemplo:
   //   images: ["assets/megan-1.jpg", "assets/megan-2.jpg", "assets/megan-3.jpg"]
   // Si un producto no tiene "images", se usa el dibujo placeholder.
-  { name: "Bag Megan", code: "Cod1", price: 40000, desc: "Diseño moderno y detalles protagonistas, esta cartera está pensada para quienes buscan un accesorio característico. Amplia, cómoda y fácil de combinar.", medidas: "39 x 18 x 11 cm", stock: true, images: ["assets/megan-1.jpg", "assets/megan-2.jpg", "assets/megan-3.jpg"] },
+  { name: "Bag Megan", code: "Cod1", price: 40000, desc: "Diseño moderno y detalles protagonistas, esta cartera está pensada para quienes buscan un accesorio característico. Amplia, cómoda y fácil de combinar.", medidas: "39 x 18 x 11 cm", stock: false, images: ["assets/megan-1.jpg", "assets/megan-2.jpg", "assets/megan-3.jpg"] },
   { name: "Bag Tini", code: "Cod2", price: 40000, desc: "La mini bag ideal para destacar con sutileza. Sus detalles crean el equilibrio perfecto entre estilo y funcionalidad.", medidas: "23 x 14 x 9 cm", stock: true, images: ["assets/tini-1.jpg", "assets/tini-2.jpg", "assets/tini-3.jpg", "assets/tini-4.jpg", "assets/tini-5.jpg"] },
-  { name: "Bag Lola", code: "Cod3", price: 36000, desc: "Una pieza versátil que destaca por su diseño sofisticado y moderno, clave para combinar fácilmente con cualquier outfit.", medidas: "26 x 15 x 7 cm", stock: true, images: ["assets/lola-1.jpg", "assets/lola-2.jpg", "assets/lola-3.jpg"] },
+  { name: "Bag Lola", code: "Cod3", price: 36000, desc: "Una pieza versátil que destaca por su diseño sofisticado y moderno, clave para combinar fácilmente con cualquier outfit.", medidas: "26 x 15 x 7 cm", stock: false, images: ["assets/lola-1.jpg", "assets/lola-2.jpg", "assets/lola-3.jpg"] },
   { name: "Bag Mery (rosa)", code: "Cod4", price: 38000, desc: "La combinación ideal entre comodidad y tendencia. Un accesorio pensado para acompañarte todos los días.", medidas: "20 x 12 x 8 cm", stock: true, images: ["assets/mery-rosa-1.png", "assets/mery-rosa-2.jpg", "assets/mery-rosa-3.jpg", "assets/mery-rosa-4.jpg", "assets/mery-rosa-5.jpg", "assets/mery-rosa-6.jpg"] },
-  { name: "Bag Val (beige)", code: "Cod5", price: 58000, desc: "Un clásico renovado con un diseño moderno y sofisticado. Es la cartera ideal para acompañarte desde la mañana hasta la noche con total comodidad, aportando elegancia y practicidad. Incluye traba (ideal para salir de noche).", medidas: "19 x 18 x 9 cm", stock: true, images: ["assets/val-beige-2.jpg", "assets/val-beige-1.jpg", "assets/val-beige-3.jpg", "assets/val-beige-4.jpg", "assets/val-beige-5.jpg"] },
+  { name: "Bag Val (beige)", code: "Cod5", price: 58000, desc: "Un clásico renovado con un diseño moderno y sofisticado. Es la cartera ideal para acompañarte desde la mañana hasta la noche con total comodidad, aportando elegancia y practicidad. Incluye traba (ideal para salir de noche).", medidas: "19 x 18 x 9 cm", stock: false, images: ["assets/val-beige-2.jpg", "assets/val-beige-1.jpg", "assets/val-beige-3.jpg", "assets/val-beige-4.jpg", "assets/val-beige-5.jpg"] },
   { name: "Bag Val (negra)", code: "Cod6", price: 58000, desc: "Un clásico renovado con un diseño moderno y sofisticado. Es la cartera ideal para acompañarte desde la mañana hasta la noche con total comodidad, aportando elegancia y practicidad. Incluye traba (ideal para salir de noche).", medidas: "19 x 18 x 9 cm", stock: true, images: ["assets/val-negra-3.jpg", "assets/val-negra-2.jpg", "assets/val-negra-1.jpg", "assets/val-negra-4.jpg", "assets/val-negra-5.jpg"] },
   { name: "Bag Juli", code: "Cod7", price: 36000, desc: "Pensada para quienes valoran los detalles, esta bag definitivamente te hará destacar.", medidas: "24 x 14 x 7 cm", stock: false, images: ["assets/juli-1.jpg", "assets/juli-2.jpg", "assets/juli-3.jpg", "assets/juli-4.jpg"] },
   { name: "Bag Cherry", code: "Cod8", price: 32000, desc: "Diseño delicado y minimalista, ofrece el espacio perfecto para llevar tus esenciales con total comodidad sin perder estilo.", medidas: "27 x 16 x 9 cm", stock: true, images: ["assets/cherry-1.jpg", "assets/cherry-2.jpg", "assets/cherry-3.jpg", "assets/cherry-4.jpg"] },
@@ -61,7 +61,7 @@ function render() {
     return `
       <div class="ab-wrap">
         <div class="ab-row ${rowClass}" data-index="${i}" tabindex="0" role="button" aria-haspopup="dialog" aria-label="Ver detalle de ${p.name}">
-          <figure class="ab-photo" style="margin:0;">
+          <figure class="ab-photo${p.stock ? "" : " is-soldout"}" style="margin:0;">
             <img src="${thumb}" alt="Foto de ${p.name}">
             <span class="ab-photo-cue" aria-hidden="true">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
@@ -191,6 +191,7 @@ function renderImage() {
   const imgs = productImages(p);
   modalEls.mainImg.src = imgs[currentImgIdx];
   modalEls.mainImg.alt = "Foto de " + p.name;
+  modalEls.mainImg.closest(".ab-modal-main").classList.toggle("is-soldout", !p.stock);
 
   const showNav = imgs.length > 1;
   modalEls.prevBtn.style.display = showNav ? "flex" : "none";
