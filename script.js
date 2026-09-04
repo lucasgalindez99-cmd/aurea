@@ -6,6 +6,16 @@ const products = [
   // con las rutas de tus fotos, por ejemplo:
   //   images: ["assets/megan-1.jpg", "assets/megan-2.jpg", "assets/megan-3.jpg"]
   // Si un producto no tiene "images", se usa el dibujo placeholder.
+  // — Nueva Colección —
+  { name: "Bag Siena", code: "Cod19", price: 40000, desc: "El clásico negro, pero con un twist. Sus detalles de tachas le dan ese toque canchero que transforma cualquier look.", medidas: "30 x 15 x 7 cm", stock: true, isNew: true, images: ["assets/siena-1.jpg", "assets/siena-2.jpg", "assets/siena-3.jpg", "assets/siena-4.jpg"] },
+  { name: "Bag Sol", code: "Cod20", price: 40000, desc: "Un modelo atemporal en gamuza que aporta calidez y estilo. Su color la convierte en el complemento perfecto para cualquier outfit.", medidas: "30 x 20 x 8 cm", stock: true, isNew: true, images: ["assets/sol-1.jpg", "assets/sol-2.jpg", "assets/sol-3.jpg"] },
+  { name: "Bolso Kylie", code: "Cod21", price: 40000, desc: "Una tote re canchera, color tendencia y su detalle acordonado en los costados le da un toque perfecto.", medidas: "40 x 24 x 8 cm", stock: true, isNew: true, images: ["assets/kylie-1.jpg", "assets/kylie-2.jpg", "assets/kylie-3.jpg", "assets/kylie-4.jpg"] },
+  { name: "Bag Cleo", code: "Cod22", price: 38000, desc: "Un diseño clásico renovado con detalles que le dan personalidad. Perfecta para usar con tus looks tanto de día como de noche.", medidas: "30 x 20 x 9 cm", stock: true, isNew: true, images: ["assets/cleo-1.jpg", "assets/cleo-2.jpg", "assets/cleo-3.jpg", "assets/cleo-4.jpg"] },
+  { name: "Bag Zara (negra)", code: "Cod23", price: 40000, desc: "Un básico infaltable. Diseño moderno y el clásico negro para acompañar cualquier look. Super amplia, con muchas divisiones dentro.", medidas: "28 x 18 x 7 cm", stock: true, isNew: true, images: ["assets/zara-negra-1.jpg", "assets/zara-negra-2.jpg", "assets/zara-negra-3.jpg", "assets/zara-negra-4.jpg", "assets/zara-negra-5.jpg"] },
+  { name: "Bag Zara (chocolate)", code: "Cod24", price: 40000, desc: "El chocolate se convierte en protagonista. 🤎 Delicada, cálida y súper combinable. Super amplia, con muchas divisiones dentro.", medidas: "28 x 18 x 7 cm", stock: true, isNew: true, images: ["assets/zara-chocolate-1.jpg", "assets/zara-chocolate-2.jpg", "assets/zara-chocolate-3.jpg", "assets/zara-chocolate-4.jpg", "assets/zara-chocolate-5.jpg"] },
+  { name: "Bag Roma", code: "Cod25", price: 42000, desc: "Esta bag es cómoda, versátil y con mucha onda. Una cartera sumamente amplia pensada para llevar todos tus esenciales sin resignar estilo.", medidas: "35 x 25 x 8 cm", stock: true, isNew: true, images: ["assets/roma-1.jpg", "assets/roma-2.jpg", "assets/roma-3.jpg"] },
+
+  // — Colección Clásica —
   { name: "Bag Megan", code: "Cod1", price: 40000, desc: "Diseño moderno y detalles protagonistas, esta cartera está pensada para quienes buscan un accesorio característico. Amplia, cómoda y fácil de combinar.", medidas: "39 x 18 x 11 cm", stock: true, images: ["assets/megan-1.jpg", "assets/megan-2.jpg", "assets/megan-3.jpg"] },
   { name: "Bag Tini", code: "Cod2", price: 40000, desc: "La mini bag ideal para destacar con sutileza. Sus detalles crean el equilibrio perfecto entre estilo y funcionalidad.", medidas: "23 x 14 x 9 cm", stock: false, images: ["assets/tini-1.jpg", "assets/tini-2.jpg", "assets/tini-3.jpg", "assets/tini-4.jpg", "assets/tini-5.jpg"] },
   { name: "Bag Lola", code: "Cod3", price: 36000, desc: "Una pieza versátil que destaca por su diseño sofisticado y moderno, clave para combinar fácilmente con cualquier outfit.", medidas: "26 x 15 x 7 cm", stock: false, images: ["assets/lola-1.jpg", "assets/lola-2.jpg", "assets/lola-3.jpg"] },
@@ -57,12 +67,15 @@ function render() {
     const rowClass = i % 2 === 1 ? "rev" : "";
     const tagClass = p.stock ? "tag-accent-2" : "tag-neutral";
     const stockLabel = p.stock ? "Disponible" : "Agotado";
+    const newTag = p.isNew ? `<span class="tag tag-accent" style="font-weight:600;">Nueva Colección</span>` : "";
+    const photoBadge = p.isNew ? `<span class="ab-new-badge">Nueva Colección</span>` : "";
     const thumb = productImages(p)[0];
     return `
       <div class="ab-wrap">
         <div class="ab-row ${rowClass}" data-index="${i}" tabindex="0" role="button" aria-haspopup="dialog" aria-label="Ver detalle de ${p.name}">
           <figure class="ab-photo${p.stock ? "" : " is-soldout"}" style="margin:0;">
             <img src="${thumb}" alt="Foto de ${p.name}">
+            ${photoBadge}
             <span class="ab-photo-cue" aria-hidden="true">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
               Ver más
@@ -71,6 +84,7 @@ function render() {
           <div class="ab-info">
             <div class="ab-tag-row" style="display:flex;align-items:center;gap:var(--space-3);margin-bottom:var(--space-3);">
               <span class="tag ${tagClass}">${stockLabel}</span>
+              ${newTag}
             </div>
             <h2 class="ab-title" style="font-family:var(--font-heading);font-weight:var(--font-heading-weight);font-size:clamp(26px,3vw,36px);letter-spacing:0;margin:0;">${p.name}</h2>
             <p class="ab-desc" style="font-size:15.5px;line-height:1.65;max-width:42ch;margin:var(--space-4) 0 0;color:color-mix(in srgb,var(--color-text) 78%,transparent);">${p.desc}</p>
@@ -224,8 +238,8 @@ function openModal(index, triggerEl) {
   lastFocusedEl = triggerEl || document.activeElement;
 
   const p = products[index];
-  modalEls.tag.className = "tag " + (p.stock ? "tag-neutral" : "tag-outline");
-  modalEls.tag.textContent = p.stock ? "Disponible" : "Agotado";
+  modalEls.tag.className = "tag " + (p.stock ? (p.isNew ? "tag-accent" : "tag-neutral") : "tag-outline");
+  modalEls.tag.textContent = p.stock ? (p.isNew ? "Nueva Colección · Disponible" : "Disponible") : "Agotado";
   modalEls.title.textContent = p.name;
   modalEls.desc.textContent = p.desc;
   modalEls.medidas.textContent = "Medidas: " + p.medidas;
@@ -266,6 +280,67 @@ function setupProductModal() {
   });
 }
 
+/* ————————————————————————————————————————————
+   Modal de Anuncio: Nueva Colección
+   ———————————————————————————————————————————— */
+function setupPromoModal() {
+  const backdrop = document.getElementById("promoModalBackdrop");
+  const closeBtn = document.getElementById("promoModalClose");
+  const ctaBtn = document.getElementById("promoModalCta");
+  if (!backdrop) return;
+
+  function openPromo() {
+    backdrop.hidden = false;
+    document.body.style.overflow = "hidden";
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        backdrop.classList.add("is-open");
+        if (closeBtn) closeBtn.focus();
+      });
+    });
+  }
+
+  function closePromo() {
+    backdrop.classList.remove("is-open");
+    document.body.style.overflow = "";
+    setTimeout(() => {
+      backdrop.hidden = true;
+    }, 300);
+  }
+
+  // Se abre suavemente al cargar la web
+  setTimeout(openPromo, 400);
+
+  if (closeBtn) {
+    closeBtn.addEventListener("click", closePromo);
+  }
+
+  backdrop.addEventListener("click", (e) => {
+    if (e.target === backdrop) {
+      closePromo();
+    }
+  });
+
+  if (ctaBtn) {
+    ctaBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      closePromo();
+      const target = document.getElementById("catalogo");
+      if (target) {
+        setTimeout(() => {
+          target.scrollIntoView({ behavior: "smooth" });
+        }, 150);
+      }
+    });
+  }
+
+  document.addEventListener("keydown", (e) => {
+    if (!backdrop.hidden && e.key === "Escape") {
+      closePromo();
+    }
+  });
+}
+
 function setupEntregasLink() {
   const wa = document.getElementById("entregasWaLink");
   if (!wa) return;
@@ -286,4 +361,5 @@ document.addEventListener("DOMContentLoaded", () => {
   setupProductModal();
   setupEntregasLink();
   setupFooterLinks();
+  setupPromoModal();
 });

@@ -520,3 +520,207 @@ a:hover { color: var(--color-accent); text-decoration: underline; }
   color: color-mix(in srgb, var(--color-bg) 60%, transparent);
   margin: 0;
 }
+
+/* ————————————————————————————————————————————
+   Smooth scroll & offset
+   ———————————————————————————————————————————— */
+html {
+  scroll-behavior: smooth;
+}
+#catalogo {
+  scroll-margin-top: 72px;
+}
+
+/* ————————————————————————————————————————————
+   Badge "Nueva Colección" en las tarjetas
+   ———————————————————————————————————————————— */
+.ab-new-badge {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  background: var(--color-bg);
+  color: var(--color-accent-700);
+  border: 1px solid var(--color-divider);
+  font-family: var(--font-heading);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: 999px;
+  box-shadow: 0 3px 12px rgba(26, 22, 16, 0.12);
+  z-index: 2;
+  pointer-events: none;
+}
+
+/* ————————————————————————————————————————————
+   Modal de Anuncio: Nueva Colección
+   ———————————————————————————————————————————— */
+.ab-promo-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 120;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(14px, 3.5vw, 32px);
+  background: color-mix(in srgb, #1a1610 65%, transparent);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.3s ease;
+}
+.ab-promo-backdrop[hidden] {
+  display: none;
+}
+.ab-promo-backdrop.is-open {
+  opacity: 1;
+  visibility: visible;
+}
+
+.ab-promo-modal {
+  position: relative;
+  width: min(720px, 100%);
+  background: var(--color-bg);
+  border: 1px solid var(--color-divider);
+  border-radius: 20px;
+  box-shadow: 0 24px 60px rgba(26, 22, 16, 0.35);
+  display: grid;
+  grid-template-columns: 1fr 1.15fr;
+  overflow: hidden;
+  transform: translateY(16px) scale(0.96);
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.ab-promo-backdrop.is-open .ab-promo-modal {
+  transform: translateY(0) scale(1);
+}
+
+.ab-promo-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  z-index: 15;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 1px solid var(--color-divider);
+  background: color-mix(in srgb, var(--color-bg) 85%, transparent);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  color: var(--color-text);
+  font-size: 24px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+}
+.ab-promo-close:hover {
+  background: var(--color-bg);
+  transform: scale(1.06);
+}
+
+.ab-promo-media {
+  position: relative;
+  background: var(--color-accent-100);
+  min-height: 100%;
+}
+.ab-promo-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 74%;
+  display: block;
+}
+
+.ab-promo-body {
+  padding: clamp(28px, 4vw, 40px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: relative;
+  z-index: 2;
+}
+
+.ab-promo-eyebrow-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+.ab-promo-eyebrow {
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-accent-700);
+}
+
+.ab-promo-title {
+  font-family: var(--font-product);
+  font-weight: 500;
+  font-style: italic;
+  font-size: clamp(24px, 3vw, 32px);
+  line-height: 1.15;
+  margin: 0 0 20px;
+  color: var(--color-text);
+}
+
+.ab-promo-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.ab-promo-btn {
+  font-size: 15px;
+  padding: 12px 36px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 4px 14px rgba(169, 130, 47, 0.35);
+  transition: transform 0.18s ease, background-color 0.18s ease;
+}
+.ab-promo-btn:hover {
+  transform: translateY(-1px);
+}
+
+/* Responsive mobile */
+@media (max-width: 680px) {
+  .ab-promo-modal {
+    grid-template-columns: 1fr;
+    max-height: 90vh;
+    overflow-y: auto;
+    border-radius: 18px;
+    width: min(390px, 92vw);
+  }
+  .ab-promo-media {
+    height: 250px;
+    min-height: 250px;
+  }
+  .ab-promo-img {
+    object-position: center 74%;
+  }
+  .ab-promo-body {
+    padding: 22px 20px 24px;
+    text-align: center;
+  }
+  .ab-promo-eyebrow-row {
+    justify-content: center;
+  }
+  .ab-promo-title {
+    font-size: 22px;
+    margin-bottom: 18px;
+  }
+  .ab-promo-actions {
+    width: 100%;
+  }
+  .ab-promo-btn {
+    width: 100%;
+    justify-content: center;
+    padding: 13px;
+    font-size: 16px;
+  }
+}
