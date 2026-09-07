@@ -9,7 +9,7 @@ const products = [
   // — Nueva Colección —
   { name: "Bag Siena", code: "Cod19", price: 40000, desc: "El clásico negro, pero con un twist. Sus detalles de tachas le dan ese toque canchero que transforma cualquier look.", medidas: "30 x 15 x 7 cm", stock: true, isNew: true, images: ["assets/siena-1.jpg", "assets/siena-2.jpg", "assets/siena-3.jpg", "assets/siena-4.jpg"] },
   { name: "Bag Sol", code: "Cod20", price: 40000, desc: "Un modelo atemporal en gamuza que aporta calidez y estilo. Su color la convierte en el complemento perfecto para cualquier outfit.", medidas: "30 x 20 x 8 cm", stock: false, isNew: true, images: ["assets/sol-1.jpg", "assets/sol-2.jpg", "assets/sol-3.jpg"] },
-  { name: "Bolso Kylie", code: "Cod21", price: 40000, desc: "Una tote re canchera, color tendencia y su detalle acordonado en los costados le da un toque perfecto.", medidas: "40 x 24 x 8 cm", stock: true, isNew: true, images: ["assets/kylie-1.jpg", "assets/kylie-2.jpg", "assets/kylie-3.jpg", "assets/kylie-4.jpg"] },
+  { name: "Bolso Kylie", code: "Cod21", price: 40000, desc: "Una tote re canchera, color tendencia y su detalle acordonado en los costados le da un toque perfecto.", medidas: "40 x 24 x 8 cm", stock: true, isNew: true, images: ["assets/kylie-0.jpg", "assets/kylie-2.jpg", "assets/kylie-3.jpg", "assets/kylie-4.jpg"] },
   { name: "Bag Cleo", code: "Cod22", price: 38000, desc: "Un diseño clásico renovado con detalles que le dan personalidad. Perfecta para usar con tus looks tanto de día como de noche.", medidas: "30 x 20 x 9 cm", stock: true, isNew: true, images: ["assets/cleo-1.jpg", "assets/cleo-2.jpg", "assets/cleo-3.jpg", "assets/cleo-4.jpg"] },
   { name: "Bag Zara (negra)", code: "Cod23", price: 40000, desc: "Un básico infaltable. Diseño moderno y el clásico negro para acompañar cualquier look. Super amplia, con muchas divisiones dentro.", medidas: "28 x 18 x 7 cm", stock: true, isNew: true, images: ["assets/zara-negra-1.jpg", "assets/zara-negra-2.jpg", "assets/zara-negra-3.jpg", "assets/zara-negra-4.jpg", "assets/zara-negra-5.jpg"] },
   { name: "Bag Zara (chocolate)", code: "Cod24", price: 40000, desc: "El chocolate se convierte en protagonista. 🤎 Delicada, cálida y súper combinable. Super amplia, con muchas divisiones dentro.", medidas: "28 x 18 x 7 cm", stock: true, isNew: true, images: ["assets/zara-chocolate-1.jpg", "assets/zara-chocolate-2.jpg", "assets/zara-chocolate-3.jpg", "assets/zara-chocolate-4.jpg", "assets/zara-chocolate-5.jpg"] },
@@ -62,9 +62,17 @@ function whatsappUrl(p) {
 
 function render() {
   const root = document.getElementById("catalogo-list");
-  root.innerHTML = products.map((p, i) => {
+  // Ordenamos solo para mostrar: primero las disponibles, después las agotadas.
+  // Usamos los índices originales del array "products" para que el modal,
+  // el link de WhatsApp y todo lo demás sigan funcionando igual.
+  const order = products
+    .map((p, i) => i)
+    .sort((a, b) => (products[a].stock === products[b].stock ? 0 : products[a].stock ? -1 : 1));
+
+  root.innerHTML = order.map((i, pos) => {
+    const p = products[i];
     const url = whatsappUrl(p);
-    const rowClass = i % 2 === 1 ? "rev" : "";
+    const rowClass = pos % 2 === 1 ? "rev" : "";
     const tagClass = p.stock ? "tag-accent-2" : "tag-neutral";
     const stockLabel = p.stock ? "Disponible" : "Agotado";
     const newTag = p.isNew ? `<span class="tag tag-accent" style="font-weight:600;">Nueva Colección</span>` : "";
