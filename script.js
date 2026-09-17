@@ -75,7 +75,6 @@ function render() {
     const rowClass = pos % 2 === 1 ? "rev" : "";
     const tagClass = p.stock ? "tag-accent-2" : "tag-neutral";
     const stockLabel = p.stock ? "Disponible" : "Agotado";
-    const newTag = p.isNew ? `<span class="tag tag-accent" style="font-weight:600;">Nueva Colección</span>` : "";
     const thumb = productImages(p)[0];
     return `
       <div class="ab-wrap">
@@ -90,7 +89,6 @@ function render() {
           <div class="ab-info">
             <div class="ab-tag-row" style="display:flex;align-items:center;gap:var(--space-3);margin-bottom:var(--space-3);">
               <span class="tag ${tagClass}">${stockLabel}</span>
-              ${newTag}
             </div>
             <h2 class="ab-title" style="font-family:var(--font-heading);font-weight:var(--font-heading-weight);font-size:clamp(26px,3vw,36px);letter-spacing:0;margin:0;">${p.name}</h2>
             <p class="ab-desc" style="font-size:15.5px;line-height:1.65;max-width:42ch;margin:var(--space-4) 0 0;color:color-mix(in srgb,var(--color-text) 78%,transparent);">${p.desc}</p>
@@ -244,8 +242,8 @@ function openModal(index, triggerEl) {
   lastFocusedEl = triggerEl || document.activeElement;
 
   const p = products[index];
-  modalEls.tag.className = "tag " + (p.stock ? (p.isNew ? "tag-accent" : "tag-neutral") : "tag-outline");
-  modalEls.tag.textContent = p.stock ? (p.isNew ? "Nueva Colección · Disponible" : "Disponible") : "Agotado";
+  modalEls.tag.className = "tag " + (p.stock ? "tag-neutral" : "tag-outline");
+  modalEls.tag.textContent = p.stock ? "Disponible" : "Agotado";
   modalEls.title.textContent = p.name;
   modalEls.desc.textContent = p.desc;
   modalEls.medidas.textContent = "Medidas: " + p.medidas;
