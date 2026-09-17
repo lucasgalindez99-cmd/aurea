@@ -76,14 +76,12 @@ function render() {
     const tagClass = p.stock ? "tag-accent-2" : "tag-neutral";
     const stockLabel = p.stock ? "Disponible" : "Agotado";
     const newTag = p.isNew ? `<span class="tag tag-accent" style="font-weight:600;">Nueva Colección</span>` : "";
-    const photoBadge = p.isNew ? `<span class="ab-new-badge">Nueva Colección</span>` : "";
     const thumb = productImages(p)[0];
     return `
       <div class="ab-wrap">
         <div class="ab-row ${rowClass}" data-index="${i}" tabindex="0" role="button" aria-haspopup="dialog" aria-label="Ver detalle de ${p.name}">
           <figure class="ab-photo${p.stock ? "" : " is-soldout"}" style="margin:0;">
             <img src="${thumb}" alt="Foto de ${p.name}">
-            ${photoBadge}
             <span class="ab-photo-cue" aria-hidden="true">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
               Ver más
@@ -288,67 +286,6 @@ function setupProductModal() {
   });
 }
 
-/* ————————————————————————————————————————————
-   Modal de Anuncio: Nueva Colección
-   ———————————————————————————————————————————— */
-function setupPromoModal() {
-  const backdrop = document.getElementById("promoModalBackdrop");
-  const closeBtn = document.getElementById("promoModalClose");
-  const ctaBtn = document.getElementById("promoModalCta");
-  if (!backdrop) return;
-
-  function openPromo() {
-    backdrop.hidden = false;
-    document.body.style.overflow = "hidden";
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        backdrop.classList.add("is-open");
-        if (closeBtn) closeBtn.focus();
-      });
-    });
-  }
-
-  function closePromo() {
-    backdrop.classList.remove("is-open");
-    document.body.style.overflow = "";
-    setTimeout(() => {
-      backdrop.hidden = true;
-    }, 300);
-  }
-
-  // Se abre suavemente al cargar la web
-  setTimeout(openPromo, 400);
-
-  if (closeBtn) {
-    closeBtn.addEventListener("click", closePromo);
-  }
-
-  backdrop.addEventListener("click", (e) => {
-    if (e.target === backdrop) {
-      closePromo();
-    }
-  });
-
-  if (ctaBtn) {
-    ctaBtn.addEventListener("click", (e) => {
-      e.preventDefault();
-      closePromo();
-      const target = document.getElementById("catalogo");
-      if (target) {
-        setTimeout(() => {
-          target.scrollIntoView({ behavior: "smooth" });
-        }, 150);
-      }
-    });
-  }
-
-  document.addEventListener("keydown", (e) => {
-    if (!backdrop.hidden && e.key === "Escape") {
-      closePromo();
-    }
-  });
-}
-
 function setupEntregasLink() {
   const wa = document.getElementById("entregasWaLink");
   if (!wa) return;
@@ -369,5 +306,4 @@ document.addEventListener("DOMContentLoaded", () => {
   setupProductModal();
   setupEntregasLink();
   setupFooterLinks();
-  setupPromoModal();
 });
