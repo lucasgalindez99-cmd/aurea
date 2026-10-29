@@ -1,3 +1,7 @@
 .firebase/
 _respaldo-antes-firebase/
 .DS_Store
+.agents/
+.claude/
+skills-lock.json
+*.docx

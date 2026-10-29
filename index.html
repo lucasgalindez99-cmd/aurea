@@ -3,87 +3,97 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Áurea Bags — Catálogo</title>
-<link rel="stylesheet" href="ds-styles.css">
+<title>Áurea Bags — Carteras en Córdoba</title>
+<meta name="description" content="Carteras y accesorios elegidos en Córdoba. Mirá la colección y consultá por WhatsApp.">
+<meta name="theme-color" content="#FCFBF9">
+<link rel="icon" href="assets/logo-aurea-transparent.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gloock&family=Italiana&family=Jost:wght@300;400;500;600&display=swap">
 <link rel="stylesheet" href="styles.css">
 </head>
-<body>
+<body class="site">
 
-<nav class="nav" style="position:sticky;top:0;z-index:30;background:var(--color-bg);border-bottom:2px solid var(--color-divider);padding-top:var(--space-4);padding-bottom:var(--space-4);">
-  <span class="nav-brand" style="display:flex;align-items:center;gap:var(--space-3);">
-    <img src="assets/logo-aurea-transparent.png" alt="" style="height:52px;width:auto;display:block;background:transparent;">
-    <span class="nav-word">Áurea <em>Bags</em></span>
-  </span>
+<a class="skip" href="#catalogo">Ir al catálogo</a>
 
-  <button type="button" id="navToggle" class="nav-toggle" aria-expanded="false" aria-controls="navLinks" aria-label="Abrir menú">
-    <svg width="22" height="16" viewBox="0 0 22 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <line class="bar bar-top" x1="1" y1="1" x2="21" y2="1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-      <line class="bar bar-mid" x1="1" y1="8" x2="21" y2="8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-      <line class="bar bar-bot" x1="1" y1="15" x2="21" y2="15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-    </svg>
-  </button>
-
-  <div id="navLinks" class="nav-links">
-    <a href="#catalogo" class="nav-link">Catálogo</a>
-    <a href="#entregas" class="nav-link">Entregas</a>
-  </div>
-</nav>
-
-<section class="ab-hero">
-  <div class="ab-hero-deco" aria-hidden="true">
-    <img src="assets/logo-aurea-transparent.png?v=2" alt="" style="width:100%;height:100%;object-fit:contain;display:block;">
-  </div>
-  <div class="ab-wrap ab-hero-inner">
-    <h1 id="heroTitle" class="ab-hero-in" style="font-family:var(--font-heading);font-weight:var(--font-heading-weight);font-size:clamp(40px,6.5vw,84px);line-height:1.02;letter-spacing:0;margin:0;max-width:15ch;animation-delay:.15s;">Carteras que acompañan cada versión tuya.</h1>
-    <p id="heroDesc" class="ab-hero-in ab-hero-desc" style="font-size:18px;line-height:1.7;max-width:52ch;margin:var(--space-6) 0 0;color:color-mix(in srgb,var(--color-text) 75%,transparent);animation-delay:.28s;">Un catálogo elegido para quienes buscan carteras que combinen estilo, calidad y personalidad. Elegí tu próxima cartera favorita y escribinos por WhatsApp para coordinar la compra.</p>
-    <a href="#catalogo" class="btn btn-primary ab-hero-in" style="margin-top:var(--space-6);animation-delay:.4s;">Ver colección</a>
-  </div>
-</section>
-
-<hr class="hr">
-
-<section id="catalogo" style="padding:var(--space-4) 0;position:relative;">
-  <div class="ab-catalogo-deco" aria-hidden="true">
-    <img src="assets/logo-aurea-transparent.png" alt="" style="width:100%;height:100%;object-fit:contain;display:block;">
-  </div>
-  <div class="ab-wrap" style="padding-top:clamp(32px,5vw,56px);position:relative;z-index:1;">
-    <span style="display:block;font-size:13px;letter-spacing:0.14em;text-transform:uppercase;color:var(--color-accent-700);">Catálogo completo</span>
-  </div>
-  <div id="catalogo-list" style="position:relative;z-index:1;"></div>
-</section>
-
-<section id="entregas" class="ab-entregas">
-  <div class="ab-entregas-deco" aria-hidden="true">
-    <img src="assets/logo-aurea-transparent.png" alt="" style="width:100%;height:100%;object-fit:contain;display:block;">
-  </div>
-  <div class="ab-wrap ab-entregas-inner">
-    <span class="ab-entregas-eyebrow">Envío y entrega</span>
-    <h2 id="entregasTitle" class="ab-title ab-entregas-title">Coordinamos tu entrega en persona</h2>
-    <p id="entregasDesc" class="ab-entregas-desc">Las entregas se coordinan en Código Capital. Escribinos por WhatsApp y acordamos juntas el día y el horario que más te convengan.</p>
-    <a href="#" id="entregasWaLink" target="_blank" rel="noopener" class="btn btn-primary ab-entregas-btn">
-      <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.28-1.38a9.9 9.9 0 0 0 4.76 1.21h.01c5.46 0 9.9-4.45 9.9-9.91C21.96 6.45 17.51 2 12.04 2zm5.8 14.03c-.24.68-1.4 1.3-1.93 1.36-.5.06-1.06.09-1.72-.11-.4-.12-.9-.29-1.56-.57-2.74-1.18-4.53-3.94-4.67-4.13-.14-.19-1.11-1.48-1.11-2.82s.7-2.01.95-2.28c.24-.27.53-.34.71-.34l.51.01c.16 0 .38-.06.6.46.22.53.75 1.83.82 1.96.07.14.11.3.02.48-.09.19-.13.3-.26.46-.13.16-.28.36-.4.48-.13.13-.27.28-.12.55.16.27.7 1.16 1.51 1.88 1.04.93 1.91 1.22 2.19 1.36.28.14.44.12.6-.07.16-.19.68-.79.86-1.06.18-.27.36-.22.6-.13.24.09 1.53.72 1.79.85.27.13.44.2.51.31.06.11.06.65-.18 1.33z"/></svg>
-      Coordinar por WhatsApp
+<header class="hdr">
+  <div class="hdr-in">
+    <a href="./" class="hdr-brand" aria-label="Áurea Bags, inicio">
+      <img src="assets/logo-aurea-transparent.png" alt="" width="40" height="40">
+      <span>Áurea</span>
     </a>
-  </div>
-</section>
 
-<section class="ab-footer" id="footer-social" style="background:var(--color-accent-2-700);color:var(--color-bg);padding:clamp(56px,8vw,96px) 0;">
-  <div class="ab-wrap ab-footer-inner">
-    <p class="ab-footer-word">Áurea <em>Bags</em></p>
-    <p class="ab-footer-tagline">Carteras con estilo, todos los días</p>
-    <div class="ab-footer-social-row">
-      <a id="footerIgLink" href="https://www.instagram.com/aurea.bags.cba?igsh=OHlwend3aDZnbTF1" target="_blank" rel="noopener" class="ab-footer-icon" aria-label="Instagram">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="1" fill="currentColor" stroke="none"/></svg>
-      </a>
-      <a href="#" id="footerWaLink" target="_blank" rel="noopener" class="ab-footer-icon" aria-label="WhatsApp">
-        <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.28-1.38a9.9 9.9 0 0 0 4.76 1.21h.01c5.46 0 9.9-4.45 9.9-9.91C21.96 6.45 17.51 2 12.04 2zm5.8 14.03c-.24.68-1.4 1.3-1.93 1.36-.5.06-1.06.09-1.72-.11-.4-.12-.9-.29-1.56-.57-2.74-1.18-4.53-3.94-4.67-4.13-.14-.19-1.11-1.48-1.11-2.82s.7-2.01.95-2.28c.24-.27.53-.34.71-.34l.51.01c.16 0 .38-.06.6.46.22.53.75 1.83.82 1.96.07.14.11.3.02.48-.09.19-.13.3-.26.46-.13.16-.28.36-.4.48-.13.13-.27.28-.12.55.16.27.7 1.16 1.51 1.88 1.04.93 1.91 1.22 2.19 1.36.28.14.44.12.6-.07.16-.19.68-.79.86-1.06.18-.27.36-.22.6-.13.24.09 1.53.72 1.79.85.27.13.44.2.51.31.06.11.06.65-.18 1.33z"/></svg>
-      </a>
+    <nav id="navLinks" class="hdr-nav" aria-label="Principal">
+      <a href="#catalogo">Colección</a>
+      <a href="#entregas">Cómo comprar</a>
+      <a href="#" id="navIgLink" target="_blank" rel="noopener">Instagram</a>
+    </nav>
+
+    <a href="#" id="navWaLink" target="_blank" rel="noopener" class="hdr-wa">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.28-1.38a9.9 9.9 0 0 0 4.76 1.21h.01c5.46 0 9.9-4.45 9.9-9.91C21.96 6.45 17.51 2 12.04 2zm5.8 14.03c-.24.68-1.4 1.3-1.93 1.36-.5.06-1.06.09-1.72-.11-.4-.12-.9-.29-1.56-.57-2.740-1.18-4.53-3.94-4.67-4.13-.14-.19-1.11-1.48-1.11-2.82s.7-2.01.95-2.28c.24-.27.53-.34.71-.34l.51.01c.16 0 .38-.06.6.46.22.53.75 1.83.82 1.96.07.14.11.3.02.48-.09.19-.13.3-.26.46-.13.16-.28.36-.4.48-.13.13-.27.28-.12.55.16.27.7 1.16 1.51 1.88 1.04.93 1.91 1.22 2.19 1.36.28.14.44.12.6-.07.16-.19.68-.79.86-1.06.18-.27.36-.22.6-.13.24.09 1.53.72 1.79.85.27.13.44.2.51.31.06.11.06.65-.18 1.33z"/></svg>
+      <span>Escribinos</span>
+    </a>
+
+    <button type="button" id="navToggle" class="hdr-toggle" aria-expanded="false" aria-controls="navLinks" aria-label="Abrir menú">
+      <span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<main>
+  <section class="hero" aria-labelledby="heroTitle">
+    <p class="hero-word" aria-hidden="true">Áurea</p>
+    <div class="hero-grid">
+      <div class="hero-copy">
+        <h1 id="heroTitle" class="hero-title">Carteras que acompañan cada versión tuya.</h1>
+        <p id="heroDesc" class="hero-desc">Un catálogo elegido para quienes buscan carteras que combinen estilo, calidad y personalidad. Elegí tu próxima cartera favorita y escribinos por WhatsApp para coordinar la compra.</p>
+        <div class="hero-actions">
+          <a href="#catalogo" class="btn btn-ink">Ver la colección</a>
+          <a href="#entregas" class="btn btn-line">Cómo comprar</a>
+        </div>
+      </div>
+      <div class="hero-photos" id="heroPhotos" aria-label="Modelos destacados">
+        <span class="hero-ph"></span><span class="hero-ph"></span><span class="hero-ph"></span>
+      </div>
     </div>
-    <div class="ab-footer-bottom">
-      
+  </section>
+
+  <section id="catalogo" class="shop" aria-labelledby="shopTitle">
+    <div class="wrap shop-head">
+      <h2 id="shopTitle" class="h-display">La colección</h2>
+      <p class="shop-note">Tocá un modelo para ver todas sus fotos, medidas y precio.</p>
+    </div>
+    <div id="catalogo-list"></div>
+  </section>
+
+  <section id="entregas" class="buy" aria-labelledby="entregasTitle">
+    <div class="wrap buy-grid">
+      <div class="buy-copy">
+        <h2 id="entregasTitle" class="h-display">Coordinamos tu entrega en persona</h2>
+        <p id="entregasDesc" class="buy-desc">Las entregas se coordinan en Código Capital. Escribinos por WhatsApp y acordamos juntas el día y el horario que más te convengan.</p>
+        <a href="#" id="entregasWaLink" target="_blank" rel="noopener" class="btn btn-ink">Coordinar por WhatsApp</a>
+      </div>
+      <ol class="buy-steps">
+        <li><strong>Elegí tu cartera</strong><span>Mirá las fotos y medidas de cada modelo en la colección.</span></li>
+        <li><strong>Escribinos por WhatsApp</strong><span>Desde el botón de cada cartera, con el modelo y el precio ya cargados.</span></li>
+        <li><strong>Retirala en Código Capital</strong><span>Acordamos el día y el horario que mejor te quede.</span></li>
+      </ol>
+    </div>
+  </section>
+</main>
+
+<footer class="ftr" id="footer-social">
+  <div class="wrap">
+    <p class="ftr-word" aria-hidden="true">Áurea</p>
+    <div class="ftr-row">
+      <p class="ftr-tag">Carteras con estilo, todos los días. Córdoba, Argentina.</p>
+      <div class="ftr-links">
+        <a href="https://www.instagram.com/aurea.bags.cba?igsh=OHlwend3aDZnbTF1" id="footerIgLink" target="_blank" rel="noopener">Instagram</a>
+        <a href="#" id="footerWaLink" target="_blank" rel="noopener">WhatsApp</a>
+      </div>
     </div>
   </div>
-</section>
+</footer>
 
 <script type="module" src="script.js"></script>
 </body>

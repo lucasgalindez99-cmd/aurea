@@ -1,7 +1,7 @@
 // Tienda pública de Áurea Bags.
 // Los productos, secciones y ajustes se leen de Firebase (Firestore) y se
-// administran desde /admin. Si Firebase todavía no está configurado, se
-// muestran los productos de legacy-products.js para que la página nunca quede vacía.
+// administran desde /admin. Si Firebase todavía no está configurado (o la base
+// está vacía), se muestran los productos de legacy-products.js.
 import { FIREBASE_READY } from "./firebase-config.js";
 
 let settings = {
@@ -9,10 +9,11 @@ let settings = {
   saludo: "Hola! Me interesa esta cartera:",
   instagram: "",
 };
-let products = [];   // productos visibles, ya normalizados
-let groups = [];     // [{ id, name, items: [indices de products] }]
+let products = [];     // productos visibles, ya normalizados
+let groups = [];       // [{ id, name, slug, items: [índices de products] }]
+let activeSlug = null; // sección que se está mostrando (cada sección es una pestaña)
 
-/* ———————————————— Carga de datos ———————————————— */
+/* ════════════════ Datos ════════════════ */
 
 function normalizeProduct(raw, id) {
   const images = (raw.images || [])
@@ -21,11 +22,9 @@ function normalizeProduct(raw, id) {
   return {
     id,
     name: raw.name || "",
-    code: raw.code || "",
     price: Number(raw.price) || 0,
     desc: raw.desc || "",
     medidas: raw.medidas || "",
-    stockQty: Math.max(0, Math.floor(Number(raw.stock) || 0)),
     inStock: Number(raw.stock) > 0,
     isNew: !!raw.isNew,
     visible: raw.visible !== false,
@@ -45,17 +44,20 @@ async function loadFromFirebase() {
     getDocs(collection(db, "products")),
     getDoc(doc(db, "settings", "site")),
   ]);
-  const sections = secSnap.docs.map((d) => ({ id: d.id, ...d.data() }));
-  const prods = prodSnap.docs.map((d) => normalizeProduct(d.data(), d.id));
-  const site = setSnap.exists() ? setSnap.data() : {};
-  return { sections, prods, site };
+  return {
+    sections: secSnap.docs.map((d) => ({ id: d.id, ...d.data() })),
+    prods: prodSnap.docs.map((d) => normalizeProduct(d.data(), d.id)),
+    site: setSnap.exists() ? setSnap.data() : {},
+  };
 }
 
 async function loadFromLegacy() {
   const { LEGACY_SECTIONS, LEGACY_PRODUCTS, LEGACY_SETTINGS } = await import("./legacy-products.js");
-  const sections = LEGACY_SECTIONS.map((s, i) => ({ id: s.key, name: s.name, order: i, visible: true }));
-  const prods = LEGACY_PRODUCTS.map((p, i) => normalizeProduct({ ...p, order: i }, "legacy-" + i));
-  return { sections, prods, site: LEGACY_SETTINGS };
+  return {
+    sections: LEGACY_SECTIONS.map((s, i) => ({ id: s.key, name: s.name, order: i, visible: true })),
+    prods: LEGACY_PRODUCTS.map((p, i) => normalizeProduct({ ...p, order: i }, "legacy-" + i)),
+    site: LEGACY_SETTINGS,
+  };
 }
 
 function buildGroups(sections, prods) {
@@ -63,11 +65,11 @@ function buildGroups(sections, prods) {
     .filter((s) => s.visible !== false)
     .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
   const known = new Set(sections.map((s) => s.id));
-  const hiddenSections = new Set(sections.filter((s) => s.visible === false).map((s) => s.id));
+  const hidden = new Set(sections.filter((s) => s.visible === false).map((s) => s.id));
 
-  products = prods.filter((p) => p.visible && !hiddenSections.has(p.sectionId));
+  products = prods.filter((p) => p.visible && !hidden.has(p.sectionId));
 
-  // Dentro de cada sección: primero las disponibles, después las agotadas; luego por orden manual.
+  // Dentro de cada sección: primero las disponibles, después las agotadas; luego el orden del panel.
   const sortIdx = (arr) =>
     arr.sort((a, b) => {
       const A = products[a], B = products[b];
@@ -79,104 +81,118 @@ function buildGroups(sections, prods) {
     .map((s) => ({
       id: s.id,
       name: s.name,
+      slug: slugify(s.name) || s.id,
       items: sortIdx(products.map((p, i) => i).filter((i) => products[i].sectionId === s.id)),
     }))
     .filter((g) => g.items.length);
 
   const orphans = sortIdx(products.map((p, i) => i).filter((i) => !known.has(products[i].sectionId)));
-  if (orphans.length) groups.push({ id: "otros", name: groups.length ? "Más modelos" : "", items: orphans });
+  if (orphans.length) groups.push({ id: "otros", name: "Más modelos", slug: "mas-modelos", items: orphans });
 }
 
-/* ———————————————— Utilidades ———————————————— */
+/* ════════════════ Utilidades ════════════════ */
 
 function esc(s) {
   return String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 }
 
+function slugify(s) {
+  return String(s || "").normalize("NFD").replace(/\p{Diacritic}/gu, "").toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+}
+
 function formatPrice(n) { return "$" + Math.round(n).toLocaleString("es-AR"); }
 
-function bagPlaceholderSrc() {
+function placeholderSrc() {
   const svg = "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 320 400'>" +
-    "<rect width='320' height='400' fill='#f4ead8'/>" +
-    "<g fill='none' stroke='#a9822f' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'>" +
-    "<path d='M124 158 v-18 a36 36 0 0 1 72 0 v18'/>" +
-    "<rect x='86' y='158' width='148' height='128' rx='8'/>" +
-    "<line x1='86' y1='196' x2='234' y2='196'/>" +
-    "<rect x='150' y='182' width='20' height='16' rx='2'/></g></svg>";
+    "<rect width='320' height='400' fill='#EFEAE4'/>" +
+    "<g fill='none' stroke='#A9822F' stroke-width='3' stroke-linecap='round' stroke-linejoin='round' opacity='.6'>" +
+    "<path d='M134 166 v-16 a26 26 0 0 1 52 0 v16'/>" +
+    "<rect x='104' y='166' width='112' height='96' rx='6'/></g></svg>";
   return "data:image/svg+xml," + encodeURIComponent(svg);
 }
 
-// Devuelve las fotos de un producto (la primera es la portada). Si no tiene, usa el dibujo placeholder.
-function productImages(p) {
-  return p.images.length ? p.images : [bagPlaceholderSrc()];
+const productImages = (p) => (p.images.length ? p.images : [placeholderSrc()]);
+const waNumber = () => String(settings.whatsapp || "").replace(/[^0-9]/g, "");
+const waLink = (msg) => "https://wa.me/" + waNumber() + "?text=" + encodeURIComponent(msg);
+const whatsappUrl = (p) =>
+  waLink((settings.saludo || "Hola! Me interesa esta cartera:") + "\n\n" + p.name + " - " + formatPrice(p.price));
+
+const ICON_WA = `<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.28-1.38a9.9 9.9 0 0 0 4.76 1.21h.01c5.46 0 9.9-4.45 9.9-9.91C21.96 6.45 17.51 2 12.04 2zm5.8 14.03c-.24.68-1.4 1.3-1.93 1.36-.5.06-1.06.09-1.72-.11-.4-.12-.9-.29-1.56-.57-2.74-1.18-4.53-3.94-4.67-4.13-.14-.19-1.11-1.48-1.11-2.82s.7-2.01.95-2.28c.24-.27.53-.34.71-.34l.51.01c.16 0 .38-.06.6.46.22.53.75 1.83.82 1.96.07.14.11.3.02.48-.09.19-.13.3-.26.46-.13.16-.28.36-.4.48-.13.13-.27.28-.12.55.16.27.7 1.16 1.51 1.88 1.04.93 1.91 1.22 2.19 1.36.28.14.44.12.6-.07.16-.19.68-.79.86-1.06.18-.27.36-.22.6-.13.24.09 1.53.72 1.79.85.27.13.44.2.51.31.06.11.06.65-.18 1.33z"/></svg>`;
+const ICON_CLOSE = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M5 5l14 14M19 5L5 19"/></svg>`;
+const ICON_PREV = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>`;
+const ICON_NEXT = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>`;
+
+/* ════════════════ Portada ════════════════ */
+
+function renderHero() {
+  const box = document.getElementById("heroPhotos");
+  if (!box) return;
+  // Las 3 primeras disponibles con foto (de la primera sección hacia abajo) son las destacadas.
+  const ordered = groups.flatMap((g) => g.items);
+  const picks = ordered.filter((i) => products[i].inStock && products[i].images.length).slice(0, 3);
+  if (picks.length < 3) picks.push(...ordered.filter((i) => products[i].images.length && !picks.includes(i)).slice(0, 3 - picks.length));
+  if (!picks.length) return;
+  box.innerHTML = picks.map((i) => {
+    const p = products[i];
+    return `<button type="button" class="hero-pick" data-index="${i}" aria-label="Ver ${esc(p.name)}">
+      <img src="${esc(p.images[0])}" alt="" fetchpriority="high">
+      <span class="hero-cap">${esc(p.name)}</span>
+    </button>`;
+  }).join("");
 }
 
-function waNumber() { return String(settings.whatsapp || "").replace(/[^0-9]/g, ""); }
+/* ════════════════ Colección ════════════════ */
 
-function waLink(msg) { return "https://wa.me/" + waNumber() + "?text=" + encodeURIComponent(msg); }
-
-function whatsappUrl(p) {
-  return waLink((settings.saludo || "Hola! Me interesa esta cartera:") + "\n\n" + p.name + " - " + formatPrice(p.price));
-}
-
-/* ———————————————— Render del catálogo ———————————————— */
-
-function rowHtml(i, pos) {
+function cardHtml(i, pos) {
   const p = products[i];
-  const url = whatsappUrl(p);
-  const rowClass = pos % 2 === 1 ? "rev" : "";
-  const tagClass = p.inStock ? "tag-accent-2" : "tag-neutral";
-  const stockLabel = p.inStock ? "Disponible" : "Agotado";
-  const thumb = productImages(p)[0];
+  const imgs = productImages(p);
+  const lazy = pos < 4 ? "eager" : "lazy";
   return `
-      <div class="ab-wrap">
-        <div class="ab-row ${rowClass}" data-index="${i}" tabindex="0" role="button" aria-haspopup="dialog" aria-label="Ver detalle de ${esc(p.name)}">
-          <figure class="ab-photo${p.inStock ? "" : " is-soldout"}" style="margin:0;">
-            <img src="${esc(thumb)}" alt="Foto de ${esc(p.name)}" loading="${pos < 2 ? "eager" : "lazy"}">
-            <span class="ab-photo-cue" aria-hidden="true">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-              Ver más
-            </span>
-          </figure>
-          <div class="ab-info">
-            <div class="ab-tag-row" style="display:flex;align-items:center;gap:var(--space-3);margin-bottom:var(--space-3);">
-              <span class="tag ${tagClass}">${stockLabel}</span>
-              ${p.isNew ? `<span class="tag ab-tag-new">Nuevo</span>` : ""}
-            </div>
-            <h2 class="ab-title" style="font-family:var(--font-heading);font-weight:var(--font-heading-weight);font-size:clamp(26px,3vw,36px);letter-spacing:0;margin:0;">${esc(p.name)}</h2>
-            <p class="ab-desc" style="font-size:15.5px;line-height:1.65;max-width:42ch;margin:var(--space-4) 0 0;color:color-mix(in srgb,var(--color-text) 78%,transparent);">${esc(p.desc)}</p>
-            ${p.medidas ? `<p class="ab-medidas" style="font-size:13px;margin:var(--space-3) 0 0;color:color-mix(in srgb,var(--color-text) 58%,transparent);">Medidas: ${esc(p.medidas)}</p>` : ""}
-            <div class="ab-meta-row">
-              <p class="ab-price" style="font-family:var(--font-heading);font-weight:var(--font-heading-weight);font-size:26px;color:var(--color-accent-700);margin:var(--space-5) 0 0;">${formatPrice(p.price)}</p>
-              <div class="ab-mobile-more" aria-hidden="true">
-                Ver detalle
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
-              </div>
-            </div>
-            <a href="${esc(url)}" target="_blank" rel="noopener" class="btn btn-secondary js-wa-link ab-wa-btn" style="margin-top:var(--space-5);display:inline-flex;">Consultar por WhatsApp</a>
-          </div>
-        </div>
-        <hr class="hr">
-      </div>`;
+    <button type="button" class="card${p.inStock ? "" : " is-out"}" data-index="${i}" aria-haspopup="dialog">
+      <span class="card-media">
+        <img class="main" src="${esc(imgs[0])}" alt="${esc(p.name)}" loading="${lazy}">
+        ${imgs[1] ? `<img class="alt" src="${esc(imgs[1])}" alt="" loading="lazy">` : ""}
+        ${p.isNew && p.inStock ? `<span class="card-flag">Nuevo</span>` : ""}
+        ${p.inStock ? "" : `<span class="card-flag is-out">Agotada</span>`}
+      </span>
+      <span class="card-body">
+        <span class="card-name">${esc(p.name)}</span>
+        <span class="card-price">${formatPrice(p.price)}</span>
+      </span>
+    </button>`;
 }
 
-function render() {
+function render(animate = false) {
   const root = document.getElementById("catalogo-list");
   if (!groups.length) {
-    root.innerHTML = `<div class="ab-wrap"><p class="ab-catalog-msg">Pronto vas a ver nuestras carteras acá. Mientras tanto, <a href="${esc(waLink("Hola! Quiero consultar por el catálogo de Áurea Bags"))}" target="_blank" rel="noopener">escribinos por WhatsApp</a>.</p></div>`;
+    root.innerHTML = `<p class="catalog-msg">Estamos preparando la próxima colección. Mientras tanto, <a href="${esc(waLink("Hola! Quiero consultar por el catálogo de Áurea Bags"))}" target="_blank" rel="noopener">escribinos por WhatsApp</a> y te contamos qué hay disponible.</p>`;
     return;
   }
-  const named = groups.filter((g) => g.name);
-  const chips = named.length > 1
-    ? `<div class="ab-wrap"><nav class="ab-section-chips" aria-label="Secciones del catálogo">${named
-        .map((g) => `<a href="#sec-${esc(g.id)}" class="ab-chip">${esc(g.name)}</a>`).join("")}</nav></div>`
+  if (!groups.some((g) => g.slug === activeSlug)) activeSlug = groups[0].slug;
+  const tabs = groups.length > 1;
+  const g = tabs ? groups.find((x) => x.slug === activeSlug) : null;
+  const items = tabs ? g.items : groups.flatMap((x) => x.items);
+
+  const bar = tabs
+    ? `<div class="tabs-bar"><nav class="tabs" aria-label="Secciones">${groups.map((x) =>
+        `<a href="?seccion=${esc(x.slug)}" data-slug="${esc(x.slug)}" class="tab${x.slug === activeSlug ? " is-active" : ""}"${x.slug === activeSlug ? ' aria-current="page"' : ""}>${esc(x.name)}<small>${x.items.length}</small></a>`
+      ).join("")}</nav></div>`
     : "";
-  root.innerHTML = chips + groups.map((g) => {
-    const head = g.name
-      ? `<div class="ab-wrap ab-section-head" id="sec-${esc(g.id)}"><h2 class="ab-section-title">${esc(g.name)}</h2><span class="ab-section-count">${g.items.length} ${g.items.length === 1 ? "modelo" : "modelos"}</span></div>`
-      : "";
-    return head + g.items.map((i, pos) => rowHtml(i, pos)).join("");
-  }).join("");
+
+  root.innerHTML = bar + `<div class="wrap"><div class="grid${animate ? " is-swapping" : ""}">${items.map(cardHtml).join("")}</div></div>`;
+
+  // En celular la barra de secciones se desliza: centramos la pestaña activa sin mover la página.
+  const active = root.querySelector(".tab.is-active");
+  if (active) {
+    const bar = active.parentElement;
+    bar.scrollLeft = active.offsetLeft - (bar.clientWidth - active.offsetWidth) / 2;
+  }
+}
+
+function renderSkeleton() {
+  document.getElementById("catalogo-list").innerHTML =
+    `<div class="wrap"><div class="grid" aria-busy="true" aria-label="Cargando la colección">${'<span class="skeleton"></span>'.repeat(8)}</div></div>`;
 }
 
 function applySettings() {
@@ -189,201 +205,244 @@ function applySettings() {
   set("entregasTitle", settings.entregasTitle);
   set("entregasDesc", settings.entregasDesc);
   set("footerIgLink", settings.instagram, "href");
-  const ent = document.getElementById("entregasWaLink");
-  if (ent) ent.href = waLink("Hola! Quiero coordinar la entrega de mi pedido en Código Capital");
-  const foot = document.getElementById("footerWaLink");
-  if (foot) foot.href = waLink("Hola! Quiero consultar por el catálogo de Áurea Bags");
+  set("navIgLink", settings.instagram || document.getElementById("footerIgLink")?.href, "href");
+  const generic = waLink("Hola! Quiero consultar por el catálogo de Áurea Bags");
+  set("navWaLink", generic, "href");
+  set("footerWaLink", generic, "href");
+  set("entregasWaLink", waLink("Hola! Quiero coordinar la entrega de mi pedido en Código Capital"), "href");
 }
 
-/* ———————————————— Navegación (menú mobile) ———————————————— */
+/* ════════════════ Secciones como pestañas ════════════════ */
 
-function setupNav() {
+const slugFromUrl = () => new URLSearchParams(location.search).get("seccion");
+
+function setupSectionTabs() {
+  const root = document.getElementById("catalogo-list");
+  root.addEventListener("click", (e) => {
+    const tab = e.target.closest(".tab[data-slug]");
+    if (!tab) return;
+    e.preventDefault();
+    if (tab.dataset.slug === activeSlug) return;
+    activeSlug = tab.dataset.slug;
+    history.pushState({ seccion: activeSlug }, "", "?seccion=" + encodeURIComponent(activeSlug) + "#catalogo");
+    render(true);
+    const shop = document.getElementById("catalogo-list");
+    const top = shop.getBoundingClientRect().top + window.scrollY - parseInt(getComputedStyle(document.documentElement).getPropertyValue("--hdr-h"));
+    if (window.scrollY > top) window.scrollTo({ top, behavior: "smooth" });
+  });
+  window.addEventListener("popstate", () => {
+    if (!groups.length) return;
+    activeSlug = slugFromUrl();
+    render(true);
+  });
+}
+
+/* ════════════════ Header ════════════════ */
+
+function setupHeader() {
+  const hdr = document.querySelector(".hdr");
   const toggle = document.getElementById("navToggle");
   const links = document.getElementById("navLinks");
-  if (!toggle || !links) return;
+  const onScroll = () => hdr.classList.toggle("is-scrolled", window.scrollY > 8);
+  window.addEventListener("scroll", onScroll, { passive: true });
+  onScroll();
 
-  function close() {
+  const close = () => {
     links.classList.remove("is-open");
     toggle.setAttribute("aria-expanded", "false");
     toggle.setAttribute("aria-label", "Abrir menú");
-  }
-  function open() {
-    links.classList.add("is-open");
-    toggle.setAttribute("aria-expanded", "true");
-    toggle.setAttribute("aria-label", "Cerrar menú");
-  }
-
+  };
   toggle.addEventListener("click", () => {
-    links.classList.contains("is-open") ? close() : open();
+    const open = !links.classList.contains("is-open");
+    links.classList.toggle("is-open", open);
+    toggle.setAttribute("aria-expanded", String(open));
+    toggle.setAttribute("aria-label", open ? "Cerrar menú" : "Abrir menú");
   });
   links.querySelectorAll("a").forEach((a) => a.addEventListener("click", close));
-  window.addEventListener("resize", () => { if (window.innerWidth > 700) close(); });
+  window.addEventListener("resize", () => { if (window.innerWidth > 860) close(); });
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape") close(); });
 }
 
-/* ————————————————————————————————————————————
-   Modal de producto: galería, specs, precio y WhatsApp
-   ———————————————————————————————————————————— */
-let modalEls = null;
-let currentIndex = 0;
-let currentImgIdx = 0;
-let lastFocusedEl = null;
+/* ════════════════ Portada → barra: el "Áurea" gigante se pasa al header ════════════════ */
+
+function setupBrandHandoff() {
+  const word = document.querySelector(".hero-word");
+  const hdr = document.querySelector(".hdr");
+  if (!word || !hdr) return;
+  document.body.classList.add("has-hero");
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  let ticking = false;
+
+  const update = () => {
+    ticking = false;
+    const r = word.getBoundingClientRect();
+    const h = hdr.offsetHeight;
+    // 0 = la palabra está entera debajo de la barra · 1 = ya pasó por debajo de la barra
+    const p = Math.min(1, Math.max(0, (h - r.top) / Math.max(1, r.height * 1.3)));
+    if (!reduce) word.style.setProperty("--p", p.toFixed(3));
+    hdr.classList.toggle("show-brand", p > 0.7);
+  };
+  const onScroll = () => { if (!ticking) { ticking = true; requestAnimationFrame(update); } };
+  window.addEventListener("scroll", onScroll, { passive: true });
+  window.addEventListener("resize", onScroll);
+  update();
+}
+
+/* ════════════════ Ficha del producto ════════════════ */
+
+let pd = null;
+let current = 0;
+let lastFocused = null;
 
 function buildModal() {
   const wrap = document.createElement("div");
-  wrap.className = "ab-modal-backdrop";
-  wrap.id = "abModalBackdrop";
+  wrap.className = "pd-backdrop";
   wrap.hidden = true;
   wrap.innerHTML = `
-    <div class="ab-modal" role="dialog" aria-modal="true" aria-labelledby="abModalTitle">
-      <button type="button" class="ab-modal-close" aria-label="Cerrar">&times;</button>
-      <div class="ab-modal-gallery">
-        <div class="ab-modal-main">
-          <button type="button" class="ab-modal-arrow prev" aria-label="Foto anterior">&#8249;</button>
-          <img id="abModalMainImg" src="" alt="">
-          <button type="button" class="ab-modal-arrow next" aria-label="Foto siguiente">&#8250;</button>
-        </div>
-        <div class="ab-modal-thumbs" id="abModalThumbs"></div>
+    <div class="pd" role="dialog" aria-modal="true" aria-labelledby="pdName">
+      <button type="button" class="pd-close" aria-label="Cerrar">${ICON_CLOSE}</button>
+      <div class="pd-gallery">
+        <div class="pd-track" tabindex="-1"></div>
+        <button type="button" class="pd-arrow prev" aria-label="Foto anterior">${ICON_PREV}</button>
+        <button type="button" class="pd-arrow next" aria-label="Foto siguiente">${ICON_NEXT}</button>
+        <div class="pd-dots" aria-hidden="true"></div>
+        <div class="pd-thumbs"></div>
       </div>
-      <div class="ab-modal-info">
-        <span class="tag" id="abModalTag"></span>
-        <h2 id="abModalTitle"></h2>
-        <p id="abModalDesc"></p>
-        <p id="abModalMedidas" class="text-muted"></p>
-        <p id="abModalPrice"></p>
-        <a id="abModalWA" href="#" target="_blank" rel="noopener" class="btn btn-secondary ab-modal-wa-btn">
-          <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.28-1.38a9.9 9.9 0 0 0 4.76 1.21h.01c5.46 0 9.9-4.45 9.9-9.91C21.96 6.45 17.51 2 12.04 2zm5.8 14.03c-.24.68-1.4 1.3-1.93 1.36-.5.06-1.06.09-1.72-.11-.4-.12-.9-.29-1.56-.57-2.74-1.18-4.53-3.94-4.67-4.13-.14-.19-1.11-1.48-1.11-2.82s.7-2.01.95-2.28c.24-.27.53-.34.71-.34l.51.01c.16 0 .38-.06.6.46.22.53.75 1.83.82 1.96.07.14.11.3.02.48-.09.19-.13.3-.26.46-.13.16-.28.36-.4.48-.13.13-.27.28-.12.55.16.27.7 1.16 1.51 1.88 1.04.93 1.91 1.22 2.19 1.36.28.14.44.12.6-.07.16-.19.68-.79.86-1.06.18-.27.36-.22.6-.13.24.09 1.53.72 1.79.85.27.13.44.2.51.31.06.11.06.65-.18 1.33z"/></svg>
-          Consultar por WhatsApp
-        </a>
+      <div class="pd-info">
+        <div class="pd-flags"></div>
+        <h2 class="pd-name" id="pdName"></h2>
+        <p class="pd-price"></p>
+        <p class="pd-desc"></p>
+        <dl class="pd-specs"></dl>
+        <div class="pd-cta">
+          <a href="#" target="_blank" rel="noopener" class="btn btn-ink pd-wa">${ICON_WA}<span></span></a>
+          <p>Te respondemos por WhatsApp para coordinar el pago y la entrega.</p>
+        </div>
       </div>
     </div>`;
   document.body.appendChild(wrap);
 
-  modalEls = {
-    backdrop: wrap,
-    closeBtn: wrap.querySelector(".ab-modal-close"),
-    prevBtn: wrap.querySelector(".ab-modal-arrow.prev"),
-    nextBtn: wrap.querySelector(".ab-modal-arrow.next"),
-    mainImg: wrap.querySelector("#abModalMainImg"),
-    thumbs: wrap.querySelector("#abModalThumbs"),
-    tag: wrap.querySelector("#abModalTag"),
-    title: wrap.querySelector("#abModalTitle"),
-    desc: wrap.querySelector("#abModalDesc"),
-    medidas: wrap.querySelector("#abModalMedidas"),
-    price: wrap.querySelector("#abModalPrice"),
-    wa: wrap.querySelector("#abModalWA"),
+  const q = (s) => wrap.querySelector(s);
+  pd = {
+    backdrop: wrap, box: q(".pd"), close: q(".pd-close"), gallery: q(".pd-gallery"), track: q(".pd-track"),
+    prev: q(".pd-arrow.prev"), next: q(".pd-arrow.next"), dots: q(".pd-dots"), thumbs: q(".pd-thumbs"),
+    flags: q(".pd-flags"), name: q(".pd-name"), price: q(".pd-price"), desc: q(".pd-desc"),
+    specs: q(".pd-specs"), wa: q(".pd-wa"), waLabel: q(".pd-wa span"),
   };
 
-  modalEls.closeBtn.addEventListener("click", closeModal);
-  modalEls.backdrop.addEventListener("click", (e) => { if (e.target === modalEls.backdrop) closeModal(); });
-  modalEls.prevBtn.addEventListener("click", () => stepImage(-1));
-  modalEls.nextBtn.addEventListener("click", () => stepImage(1));
+  pd.close.addEventListener("click", closeModal);
+  wrap.addEventListener("click", (e) => { if (e.target === wrap) closeModal(); });
+  pd.prev.addEventListener("click", () => goTo(currentSlide() - 1));
+  pd.next.addEventListener("click", () => goTo(currentSlide() + 1));
+  pd.thumbs.addEventListener("click", (e) => {
+    const t = e.target.closest("[data-i]");
+    if (t) goTo(Number(t.dataset.i));
+  });
+  let raf;
+  pd.track.addEventListener("scroll", () => {
+    cancelAnimationFrame(raf);
+    raf = requestAnimationFrame(markSlide);
+  }, { passive: true });
 
   document.addEventListener("keydown", (e) => {
-    if (modalEls.backdrop.hidden) return;
+    if (pd.backdrop.hidden) return;
     if (e.key === "Escape") closeModal();
-    if (e.key === "ArrowRight") stepImage(1);
-    if (e.key === "ArrowLeft") stepImage(-1);
+    if (e.key === "ArrowRight") goTo(currentSlide() + 1);
+    if (e.key === "ArrowLeft") goTo(currentSlide() - 1);
+    if (e.key === "Tab") {
+      const f = [...pd.box.querySelectorAll("button, a[href]")].filter((el) => el.offsetParent !== null);
+      if (!f.length) return;
+      if (e.shiftKey && document.activeElement === f[0]) { e.preventDefault(); f[f.length - 1].focus(); }
+      else if (!e.shiftKey && document.activeElement === f[f.length - 1]) { e.preventDefault(); f[0].focus(); }
+    }
   });
 }
 
-function renderImage() {
-  const p = products[currentIndex];
-  const imgs = productImages(p);
-  modalEls.mainImg.src = imgs[currentImgIdx];
-  modalEls.mainImg.alt = "Foto de " + p.name;
-  modalEls.mainImg.closest(".ab-modal-main").classList.toggle("is-soldout", !p.inStock);
+const slideCount = () => pd.track.children.length;
+const currentSlide = () => Math.round(pd.track.scrollLeft / Math.max(1, pd.track.clientWidth));
 
-  const showNav = imgs.length > 1;
-  modalEls.prevBtn.style.display = showNav ? "flex" : "none";
-  modalEls.nextBtn.style.display = showNav ? "flex" : "none";
-  modalEls.thumbs.style.display = showNav ? "flex" : "none";
-
-  modalEls.thumbs.innerHTML = imgs.map((src, i) =>
-    `<button type="button" class="ab-modal-thumb ${i === currentImgIdx ? "is-active" : ""}" data-i="${i}" aria-label="Foto ${i + 1}"><img src="${esc(src)}" alt=""></button>`
-  ).join("");
-
-  modalEls.thumbs.querySelectorAll(".ab-modal-thumb").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      currentImgIdx = Number(btn.dataset.i);
-      renderImage();
-    });
-  });
+function goTo(i) {
+  const n = slideCount();
+  const idx = (i + n) % n;
+  pd.track.scrollTo({ left: idx * pd.track.clientWidth, behavior: "smooth" });
 }
 
-function stepImage(dir) {
-  const imgs = productImages(products[currentIndex]);
-  currentImgIdx = (currentImgIdx + dir + imgs.length) % imgs.length;
-  renderImage();
+function markSlide() {
+  const i = currentSlide();
+  [...pd.thumbs.children].forEach((t, k) => t.classList.toggle("is-active", k === i));
+  [...pd.dots.children].forEach((d, k) => d.classList.toggle("is-active", k === i));
 }
 
-function openModal(index, triggerEl) {
-  if (!modalEls) buildModal();
-  currentIndex = index;
-  currentImgIdx = 0;
-  lastFocusedEl = triggerEl || document.activeElement;
-
+function openModal(index, trigger) {
+  if (!pd) buildModal();
+  current = index;
+  lastFocused = trigger || document.activeElement;
   const p = products[index];
-  modalEls.tag.className = "tag " + (p.inStock ? "tag-accent-2" : "tag-neutral");
-  modalEls.tag.textContent = p.inStock ? "Disponible" : "Agotado";
-  modalEls.title.textContent = p.name;
-  modalEls.desc.textContent = p.desc;
-  modalEls.medidas.textContent = p.medidas ? "Medidas: " + p.medidas : "";
-  modalEls.price.innerHTML = `<span class="ab-currency">$</span>` + Math.round(p.price).toLocaleString("es-AR");
-  modalEls.wa.href = whatsappUrl(p);
+  const imgs = productImages(p);
+  const many = imgs.length > 1;
 
-  renderImage();
+  pd.track.innerHTML = imgs.map((src, i) => `<img src="${esc(src)}" alt="${esc(p.name)}, foto ${i + 1} de ${imgs.length}"${i ? ' loading="lazy"' : ""}>`).join("");
+  pd.thumbs.innerHTML = many ? imgs.map((src, i) => `<button type="button" class="pd-thumb${i ? "" : " is-active"}" data-i="${i}" aria-label="Ver foto ${i + 1}"><img src="${esc(src)}" alt=""></button>`).join("") : "";
+  pd.dots.innerHTML = many ? imgs.map((_, i) => `<span class="${i ? "" : "is-active"}"></span>`).join("") : "";
+  pd.prev.hidden = pd.next.hidden = !many;
+  pd.thumbs.hidden = !many;
+  pd.gallery.classList.toggle("is-out", !p.inStock);
 
-  modalEls.backdrop.hidden = false;
-  requestAnimationFrame(() => modalEls.backdrop.classList.add("is-open"));
+  pd.flags.innerHTML = (p.inStock ? `<span class="pd-flag is-in">Disponible</span>` : `<span class="pd-flag is-out">Agotada</span>`) +
+    (p.isNew && p.inStock ? `<span class="pd-flag">Nuevo</span>` : "");
+  pd.name.textContent = p.name;
+  pd.price.textContent = formatPrice(p.price);
+  pd.desc.textContent = p.desc;
+  pd.desc.hidden = !p.desc;
+  pd.specs.innerHTML = p.medidas ? `<dt>Medidas</dt><dd>${esc(p.medidas)}</dd>` : "";
+  pd.specs.hidden = !p.medidas;
+  pd.wa.href = p.inStock ? whatsappUrl(p) : waLink(`Hola! Quería saber si va a volver a entrar la ${p.name}.`);
+  pd.waLabel.textContent = p.inStock ? "Consultar por WhatsApp" : "Avisame si vuelve a entrar";
+
+  pd.backdrop.hidden = false;
+  pd.track.scrollLeft = 0;
+  pd.box.scrollTop = 0;
+  requestAnimationFrame(() => pd.backdrop.classList.add("is-open"));
   document.body.style.overflow = "hidden";
-  modalEls.closeBtn.focus();
+  pd.close.focus({ preventScroll: true });
 }
 
 function closeModal() {
-  if (!modalEls || modalEls.backdrop.hidden) return;
-  modalEls.backdrop.classList.remove("is-open");
+  if (!pd || pd.backdrop.hidden) return;
+  pd.backdrop.classList.remove("is-open");
   document.body.style.overflow = "";
-  setTimeout(() => { modalEls.backdrop.hidden = true; }, 200);
-  if (lastFocusedEl && lastFocusedEl.focus) lastFocusedEl.focus();
+  setTimeout(() => { pd.backdrop.hidden = true; }, 250);
+  if (lastFocused && lastFocused.focus) lastFocused.focus({ preventScroll: true });
 }
 
-function setupProductModal() {
-  const root = document.getElementById("catalogo-list");
-  root.addEventListener("click", (e) => {
-    if (e.target.closest(".js-wa-link")) return; // el link de WhatsApp funciona normal, no abre el modal
-    const row = e.target.closest(".ab-row");
-    if (!row) return;
-    openModal(Number(row.dataset.index), row);
-  });
-  root.addEventListener("keydown", (e) => {
-    if (e.key !== "Enter" && e.key !== " ") return;
-    if (e.target.closest(".js-wa-link")) return;
-    const row = e.target.closest(".ab-row");
-    if (!row) return;
-    e.preventDefault();
-    openModal(Number(row.dataset.index), row);
+function setupCardClicks() {
+  document.addEventListener("click", (e) => {
+    const card = e.target.closest(".card[data-index], .hero-pick[data-index]");
+    if (card) openModal(Number(card.dataset.index), card);
   });
 }
 
-/* ———————————————— Arranque ———————————————— */
+/* ════════════════ Arranque ════════════════ */
 
 async function init() {
-  setupNav();
-  setupProductModal();
+  setupHeader();
+  setupBrandHandoff();
+  setupCardClicks();
+  setupSectionTabs();
   applySettings();
-  const root = document.getElementById("catalogo-list");
-  root.innerHTML = `<div class="ab-wrap"><p class="ab-catalog-msg">Cargando catálogo…</p></div>`;
+  renderSkeleton();
   try {
     let data = FIREBASE_READY ? await loadFromFirebase() : await loadFromLegacy();
-    // Si la base todavía está vacía (antes de importar desde /admin), mostramos los productos de siempre.
     if (FIREBASE_READY && !data.prods.length && !data.sections.length) data = await loadFromLegacy();
     settings = { ...settings, ...data.site };
     buildGroups(data.sections, data.prods);
+    activeSlug = slugFromUrl();
     applySettings();
+    renderHero();
     render();
   } catch (err) {
     console.error("[Áurea] No se pudo cargar el catálogo:", err);
-    root.innerHTML = `<div class="ab-wrap"><p class="ab-catalog-msg">No pudimos cargar el catálogo en este momento. Probá recargar la página o <a href="${esc(waLink("Hola! Quiero consultar por el catálogo de Áurea Bags"))}" target="_blank" rel="noopener">escribinos por WhatsApp</a>.</p></div>`;
+    document.getElementById("catalogo-list").innerHTML = `<p class="catalog-msg">La colección no cargó. Revisá tu conexión y recargá la página, o <a href="${esc(waLink("Hola! Quiero consultar por el catálogo de Áurea Bags"))}" target="_blank" rel="noopener">escribinos por WhatsApp</a>.</p>`;
   }
 }
 
