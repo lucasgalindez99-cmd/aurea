@@ -78,7 +78,7 @@ a:hover { color: var(--color-accent); text-decoration: underline; }
     transform: translate(-50%, -50%);
     width: min(85vw, 320px);
     height: min(85vw, 320px);
-    background: url('logoaureatransparent.png?v=2') center / contain no-repeat;
+    background: url('assets/logo-aurea-transparent.png?v=2') center / contain no-repeat;
     opacity: 0.09;
     pointer-events: none;
     z-index: 0;
@@ -530,3 +530,12 @@ html {
 #catalogo {
   scroll-margin-top: 72px;
 }
+/* — Secciones del catálogo (generadas desde el panel /admin) — */
+.ab-section-chips { display: flex; flex-wrap: wrap; gap: var(--space-2); margin-top: var(--space-4); }
+.ab-chip { display: inline-flex; align-items: center; padding: 8px 16px; border: 1px solid var(--color-accent-300); border-radius: 999px; font-size: 14px; color: var(--color-accent-700); background: transparent; transition: background .15s, color .15s; }
+.ab-chip:hover { background: var(--color-accent-100); color: var(--color-accent-700); text-decoration: none; }
+.ab-section-head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-4); padding-top: clamp(40px, 6vw, 72px); scroll-margin-top: 96px; }
+.ab-section-title { font-family: var(--font-product, var(--font-heading)); font-weight: 400; font-size: clamp(30px, 4vw, 46px); line-height: 1.1; margin: 0; color: var(--color-text); }
+.ab-section-count { font-size: 13px; letter-spacing: .12em; text-transform: uppercase; color: var(--color-accent-700); white-space: nowrap; }
+.ab-tag-new { background: var(--color-accent-100); color: var(--color-accent-700); }
+.ab-catalog-msg { padding: clamp(40px, 6vw, 72px) 0; font-size: 16px; color: color-mix(in srgb, var(--color-text) 70%, transparent); }

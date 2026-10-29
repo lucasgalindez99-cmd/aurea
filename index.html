@@ -11,7 +11,7 @@
 
 <nav class="nav" style="position:sticky;top:0;z-index:30;background:var(--color-bg);border-bottom:2px solid var(--color-divider);padding-top:var(--space-4);padding-bottom:var(--space-4);">
   <span class="nav-brand" style="display:flex;align-items:center;gap:var(--space-3);">
-    <img src="/assets/logo-aurea-transparent.png" alt="" style="height:52px;width:auto;display:block;background:transparent;">
+    <img src="assets/logo-aurea-transparent.png" alt="" style="height:52px;width:auto;display:block;background:transparent;">
     <span class="nav-word">Áurea <em>Bags</em></span>
   </span>
 
@@ -31,11 +31,11 @@
 
 <section class="ab-hero">
   <div class="ab-hero-deco" aria-hidden="true">
-    <img src="/assets/logo-aurea-transparent.png?v=2" alt="" style="width:100%;height:100%;object-fit:contain;display:block;">
+    <img src="assets/logo-aurea-transparent.png?v=2" alt="" style="width:100%;height:100%;object-fit:contain;display:block;">
   </div>
   <div class="ab-wrap ab-hero-inner">
-    <h1 class="ab-hero-in" style="font-family:var(--font-heading);font-weight:var(--font-heading-weight);font-size:clamp(40px,6.5vw,84px);line-height:1.02;letter-spacing:0;margin:0;max-width:15ch;animation-delay:.15s;">Carteras que acompañan cada versión tuya.</h1>
-    <p class="ab-hero-in ab-hero-desc" style="font-size:18px;line-height:1.7;max-width:52ch;margin:var(--space-6) 0 0;color:color-mix(in srgb,var(--color-text) 75%,transparent);animation-delay:.28s;">Un catálogo elegido para quienes buscan carteras que combinen estilo, calidad y personalidad. Elegí tu próxima cartera favorita y escribinos por WhatsApp para coordinar la compra.</p>
+    <h1 id="heroTitle" class="ab-hero-in" style="font-family:var(--font-heading);font-weight:var(--font-heading-weight);font-size:clamp(40px,6.5vw,84px);line-height:1.02;letter-spacing:0;margin:0;max-width:15ch;animation-delay:.15s;">Carteras que acompañan cada versión tuya.</h1>
+    <p id="heroDesc" class="ab-hero-in ab-hero-desc" style="font-size:18px;line-height:1.7;max-width:52ch;margin:var(--space-6) 0 0;color:color-mix(in srgb,var(--color-text) 75%,transparent);animation-delay:.28s;">Un catálogo elegido para quienes buscan carteras que combinen estilo, calidad y personalidad. Elegí tu próxima cartera favorita y escribinos por WhatsApp para coordinar la compra.</p>
     <a href="#catalogo" class="btn btn-primary ab-hero-in" style="margin-top:var(--space-6);animation-delay:.4s;">Ver colección</a>
   </div>
 </section>
@@ -44,7 +44,7 @@
 
 <section id="catalogo" style="padding:var(--space-4) 0;position:relative;">
   <div class="ab-catalogo-deco" aria-hidden="true">
-    <img src="/assets/logo-aurea-transparent.png" alt="" style="width:100%;height:100%;object-fit:contain;display:block;">
+    <img src="assets/logo-aurea-transparent.png" alt="" style="width:100%;height:100%;object-fit:contain;display:block;">
   </div>
   <div class="ab-wrap" style="padding-top:clamp(32px,5vw,56px);position:relative;z-index:1;">
     <span style="display:block;font-size:13px;letter-spacing:0.14em;text-transform:uppercase;color:var(--color-accent-700);">Catálogo completo</span>
@@ -54,12 +54,12 @@
 
 <section id="entregas" class="ab-entregas">
   <div class="ab-entregas-deco" aria-hidden="true">
-    <img src="/assets/logo-aurea-transparent.png" alt="" style="width:100%;height:100%;object-fit:contain;display:block;">
+    <img src="assets/logo-aurea-transparent.png" alt="" style="width:100%;height:100%;object-fit:contain;display:block;">
   </div>
   <div class="ab-wrap ab-entregas-inner">
     <span class="ab-entregas-eyebrow">Envío y entrega</span>
-    <h2 class="ab-title ab-entregas-title">Coordinamos tu entrega en persona</h2>
-    <p class="ab-entregas-desc">Las entregas se coordinan en Código Capital. Escribinos por WhatsApp y acordamos juntas el día y el horario que más te convengan.</p>
+    <h2 id="entregasTitle" class="ab-title ab-entregas-title">Coordinamos tu entrega en persona</h2>
+    <p id="entregasDesc" class="ab-entregas-desc">Las entregas se coordinan en Código Capital. Escribinos por WhatsApp y acordamos juntas el día y el horario que más te convengan.</p>
     <a href="#" id="entregasWaLink" target="_blank" rel="noopener" class="btn btn-primary ab-entregas-btn">
       <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.28-1.38a9.9 9.9 0 0 0 4.76 1.21h.01c5.46 0 9.9-4.45 9.9-9.91C21.96 6.45 17.51 2 12.04 2zm5.8 14.03c-.24.68-1.4 1.3-1.93 1.36-.5.06-1.06.09-1.72-.11-.4-.12-.9-.29-1.56-.57-2.74-1.18-4.53-3.94-4.67-4.13-.14-.19-1.11-1.48-1.11-2.82s.7-2.01.95-2.28c.24-.27.53-.34.71-.34l.51.01c.16 0 .38-.06.6.46.22.53.75 1.83.82 1.96.07.14.11.3.02.48-.09.19-.13.3-.26.46-.13.16-.28.36-.4.48-.13.13-.27.28-.12.55.16.27.7 1.16 1.51 1.88 1.04.93 1.91 1.22 2.19 1.36.28.14.44.12.6-.07.16-.19.68-.79.86-1.06.18-.27.36-.22.6-.13.24.09 1.53.72 1.79.85.27.13.44.2.51.31.06.11.06.65-.18 1.33z"/></svg>
       Coordinar por WhatsApp
@@ -72,7 +72,7 @@
     <p class="ab-footer-word">Áurea <em>Bags</em></p>
     <p class="ab-footer-tagline">Carteras con estilo, todos los días</p>
     <div class="ab-footer-social-row">
-      <a href="https://www.instagram.com/aurea.bags.cba?igsh=OHlwend3aDZnbTF1" target="_blank" rel="noopener" class="ab-footer-icon" aria-label="Instagram">
+      <a id="footerIgLink" href="https://www.instagram.com/aurea.bags.cba?igsh=OHlwend3aDZnbTF1" target="_blank" rel="noopener" class="ab-footer-icon" aria-label="Instagram">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="1" fill="currentColor" stroke="none"/></svg>
       </a>
       <a href="#" id="footerWaLink" target="_blank" rel="noopener" class="ab-footer-icon" aria-label="WhatsApp">
@@ -85,6 +85,6 @@
   </div>
 </section>
 
-<script src="script.js"></script>
+<script type="module" src="script.js"></script>
 </body>
 </html>

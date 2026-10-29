@@ -1,51 +1,97 @@
-const WHATSAPP_NUMBER = "5493517012317"; // reemplazá por tu número con código de país
-const SALUDO = "Hola! Me interesa esta cartera:";
+// Tienda pública de Áurea Bags.
+// Los productos, secciones y ajustes se leen de Firebase (Firestore) y se
+// administran desde /admin. Si Firebase todavía no está configurado, se
+// muestran los productos de legacy-products.js para que la página nunca quede vacía.
+import { FIREBASE_READY } from "./firebase-config.js";
 
-const products = [
-  // Tip: para cargar fotos reales de cada cartera, agregá un array "images"
-  // con las rutas de tus fotos, por ejemplo:
-  //   images: ["assets/megan-1.jpg", "assets/megan-2.jpg", "assets/megan-3.jpg"]
-  // Si un producto no tiene "images", se usa el dibujo placeholder.
-  // — Tercera Colección —
-  { name: "Bag Maddy", code: "Cod26", price: 55000, desc: "La bag Maddy se destaca por su diseño sofisticado y original, es un modelo elegante y practico para llevar en tus momentos favoritos.", medidas: "25 x 16 x 9 cm", stock: true, isNew: true, images: ["assets/maddy-0.jpg", "assets/maddy-1.jpg", "assets/maddy-2.jpg", "assets/maddy-3.jpg", "assets/maddy-4.jpg"], stock: false },
-  { name: "Bag Moka", code: "Cod27", price: 38000, desc: "La bag Moka combina un tono cálido con un diseño moderno y canchero. Su tamaño y correa la convierten en una opción cómoda y con mucho estilo.", medidas: "25 x 16 x 8 cm", stock: true, isNew: true, images: ["assets/moka-0.jpg", "assets/moka-1.jpg", "assets/moka-2.jpg"], stock: false },
-  { name: "Bag Lía", code: "Cod28", price: 43200, desc: "Delicada, simple y súper combinable. Lía es ese modelo que elegís cuando querés llevar lo esencial sin perder tu toque sofisticado.", medidas: "28 x 16 x 16 cm", stock: true, isNew: true, images: ["assets/lia-0.jpg", "assets/lia-1.jpg", "assets/lia-2.jpg", "assets/lia-3.jpg"], stock: false },
-  { name: "Tote Dakota", code: "Cod29", price: 40000, desc: "Esta tote es amplitud, comodidad y elegancia en un solo modelo. Un diseño pensado para llevar todo lo que necesitas y que combine con cualquier outfit.", medidas: "45 x 30 x 14 cm", stock: true, isNew: true, images: ["assets/dakota-0.jpg", "assets/dakota-1.jpg", "assets/dakota-2.jpg"], stock: false },
-  { name: "Bag Luna", code: "Cod30", price: 36000, desc: "Un diseño delicado con personalidad. Un tono ideal para esta época del año.", medidas: "29 x 15 x 7 cm", stock: true, isNew: true, images: ["assets/luna-0.jpg", "assets/luna-1.jpg"] },
-  { name: "Bag Gía", code: "Cod31", price: 40000, desc: "La básica más linda. Un modelo minimalista pero con personalidad. Tiene una traba de seguridad y dos correas para elegir, una mas larga y otra corta.", medidas: "22 x 11 x 7 cm", stock: true, isNew: true, images: ["assets/gia-0.jpg", "assets/gia-1.jpg", "assets/gia-2.jpg", "assets/gia-3.jpg"] },
-  { name: "Tote Bag Black", code: "Cod32", price: 50000, desc: "Modelo que combina espacio + estilo. Práctica y versátil para acompañarte durante todo el día.", medidas: "33 x 24 x 13 cm", stock: true, isNew: true, images: ["assets/tote-black-0.jpg", "assets/tote-black-1.jpg", "assets/tote-black-2.jpg", "assets/tote-black-3.jpg"] },
-  { name: "Bag Milán", code: "Cod33", price: 44800, desc: "Una bag clásica, sofisticada, super amplia y con varios espacios separados. Cómoda, práctica y fácil de combinar.", medidas: "27 x 19 x 13 cm", stock: true, isNew: true, images: ["assets/milan-0.jpg", "assets/milan-1.jpg", "assets/milan-2.jpg", "assets/milan-3.jpg", "assets/milan-4.jpg"], stock: false },
-  { name: "Bag Zoe", code: "Cod34", price: 48200, desc: "Un modelo con mucha presencia. La bag Zoe es distinta al resto por su material, también es super amplia y combinable con tus outfits favoritos. Cuenta con un detalle (que se puede quitar).", medidas: "27 x 22 x 17 cm", stock: true, isNew: true, images: ["assets/zoe-0.jpg", "assets/zoe-1.jpg", "assets/zoe-2.jpg"] },
+let settings = {
+  whatsapp: "5493517012317",
+  saludo: "Hola! Me interesa esta cartera:",
+  instagram: "",
+};
+let products = [];   // productos visibles, ya normalizados
+let groups = [];     // [{ id, name, items: [indices de products] }]
 
-  // — Segunda Colección —
-  { name: "Bag Siena", code: "Cod19", price: 40000, desc: "El clásico negro, pero con un twist. Sus detalles de tachas le dan ese toque canchero que transforma cualquier look.", medidas: "30 x 15 x 7 cm", stock: true, isNew: true, images: ["assets/siena-0.jpg", "assets/siena-2.jpg", "assets/siena-3.jpg", "assets/siena-4.jpg"] },
-  { name: "Bag Sol", code: "Cod20", price: 40000, desc: "Un modelo atemporal en gamuza que aporta calidez y estilo. Su color la convierte en el complemento perfecto para cualquier outfit.", medidas: "30 x 20 x 8 cm", stock: false, isNew: true, images: ["assets/sol-1.jpg", "assets/sol-2.jpg", "assets/sol-3.jpg"] },
-  { name: "Bolso Kylie", code: "Cod21", price: 40000, desc: "Una tote re canchera, color tendencia y su detalle acordonado en los costados le da un toque perfecto.", medidas: "40 x 24 x 8 cm", stock: true, isNew: true, images: ["assets/kylie-0.jpg", "assets/kylie-2.jpg", "assets/kylie-3.jpg", "assets/kylie-4.jpg"] },
-  { name: "Bag Cleo", code: "Cod22", price: 38000, desc: "Un diseño clásico renovado con detalles que le dan personalidad. Perfecta para usar con tus looks tanto de día como de noche.", medidas: "30 x 20 x 9 cm", stock: true, isNew: true, images: ["assets/cleo-1.jpg", "assets/cleo-2.jpg", "assets/cleo-3.jpg", "assets/cleo-4.jpg"] },
-  { name: "Bag Zara (negra)", code: "Cod23", price: 40000, desc: "Un básico infaltable. Diseño moderno y el clásico negro para acompañar cualquier look. Super amplia, con muchas divisiones dentro.", medidas: "28 x 18 x 7 cm", stock: true, isNew: true, images: ["assets/zara-negra-1.jpg", "assets/zara-negra-2.jpg", "assets/zara-negra-3.jpg", "assets/zara-negra-4.jpg", "assets/zara-negra-5.jpg"], stock: false },
-  { name: "Bag Zara (chocolate)", code: "Cod24", price: 40000, desc: "El chocolate se convierte en protagonista. 🤎 Delicada, cálida y súper combinable. Super amplia, con muchas divisiones dentro.", medidas: "28 x 18 x 7 cm", stock: true, isNew: true, images: ["assets/zara-chocolate-1.jpg", "assets/zara-chocolate-2.jpg", "assets/zara-chocolate-3.jpg", "assets/zara-chocolate-4.jpg", "assets/zara-chocolate-5.jpg"] },
-  { name: "Bag Roma", code: "Cod25", price: 42000, desc: "Esta bag es cómoda, versátil y con mucha onda. Una cartera sumamente amplia pensada para llevar todos tus esenciales sin resignar estilo.", medidas: "35 x 25 x 8 cm", stock: false, isNew: true, images: ["assets/roma-1.jpg", "assets/roma-2.jpg", "assets/roma-3.jpg"] },
+/* ———————————————— Carga de datos ———————————————— */
 
-  // — Colección Clásica —
-  { name: "Bag Megan", code: "Cod1", price: 40000, desc: "Diseño moderno y detalles protagonistas, esta cartera está pensada para quienes buscan un accesorio característico. Amplia, cómoda y fácil de combinar.", medidas: "39 x 18 x 11 cm", stock: true, images: ["assets/megan-0.jpg", "assets/megan-2.jpg", "assets/megan-3.jpg"] },
-  { name: "Bag Tini", code: "Cod2", price: 40000, desc: "La mini bag ideal para destacar con sutileza. Sus detalles crean el equilibrio perfecto entre estilo y funcionalidad.", medidas: "23 x 14 x 9 cm", stock: false, images: ["assets/tini-0.jpg", "assets/tini-2.jpg", "assets/tini-3.jpg", "assets/tini-4.jpg", "assets/tini-5.jpg"] },
-  { name: "Bag Lola", code: "Cod3", price: 36000, desc: "Una pieza versátil que destaca por su diseño sofisticado y moderno, clave para combinar fácilmente con cualquier outfit.", medidas: "26 x 15 x 7 cm", stock: false, images: ["assets/lola-0.jpg", "assets/lola-2.jpg", "assets/lola-3.jpg"] },
-  { name: "Bag Mery (rosa)", code: "Cod4", price: 38000, desc: "La combinación ideal entre comodidad y tendencia. Un accesorio pensado para acompañarte todos los días.", medidas: "20 x 12 x 8 cm", stock: true, images: ["assets/mery-rosa-0.jpg", "assets/mery-rosa-2.jpg", "assets/mery-rosa-3.jpg", "assets/mery-rosa-4.jpg", "assets/mery-rosa-5.jpg", "assets/mery-rosa-6.jpg"]},
-  { name: "Bag Val (beige)", code: "Cod5", price: 58000, desc: "Un clásico renovado con un diseño moderno y sofisticado. Es la cartera ideal para acompañarte desde la mañana hasta la noche con total comodidad, aportando elegancia y practicidad. Incluye traba (ideal para salir de noche).", medidas: "19 x 18 x 9 cm", stock: false, images: ["assets/val-beige-0.jpg", "assets/val-beige-1.jpg", "assets/val-beige-3.jpg", "assets/val-beige-4.jpg", "assets/val-beige-5.jpg"] },
-  { name: "Bag Val (negra)", code: "Cod6", price: 58000, desc: "Un clásico renovado con un diseño moderno y sofisticado. Es la cartera ideal para acompañarte desde la mañana hasta la noche con total comodidad, aportando elegancia y practicidad. Incluye traba (ideal para salir de noche).", medidas: "19 x 18 x 9 cm", stock: true, images: ["assets/val-negra-0.jpg", "assets/val-negra-2.jpg", "assets/val-negra-1.jpg", "assets/val-negra-4.jpg", "assets/val-negra-5.jpg"], stock: false },
-  { name: "Bag Juli", code: "Cod7", price: 36000, desc: "Pensada para quienes valoran los detalles, esta bag definitivamente te hará destacar.", medidas: "24 x 14 x 7 cm", stock: false, images: ["assets/juli-0.jpg", "assets/juli-2.jpg", "assets/juli-3.jpg", "assets/juli-4.jpg"] },
-  { name: "Bag Cherry", code: "Cod8", price: 32000, desc: "Diseño delicado y minimalista, ofrece el espacio perfecto para llevar tus esenciales con total comodidad sin perder estilo.", medidas: "27 x 16 x 9 cm", stock: false, images: ["assets/cherry-0.jpg", "assets/cherry-2.jpg", "assets/cherry-3.jpg", "assets/cherry-4.jpg"] },
-  { name: "Bag Diamond (borgoña)", code: "Cod9", price: 44000, desc: "Un diseño que transmite elegancia desde cada ángulo. Ideal para complementar cualquier outfit con un toque distinguido.", medidas: "31 x 22 x 10 cm", stock: true, images: ["assets/diamond-borgona-0.jpg", "assets/diamond-borgona-2.jpg", "assets/diamond-borgona-3.jpg"] },
-  { name: "Bag Diamond (negra)", code: "Cod10", price: 44000, desc: "Un diseño que transmite elegancia desde cada ángulo. Ideal para complementar cualquier outfit con un toque distinguido.", medidas: "31 x 22 x 10 cm", stock: true, images: ["assets/diamond-negra-0.jpg", "assets/diamond-negra-2.jpg", "assets/diamond-negra-3.jpg"],stock: false },
-  { name: "Bag Classic", code: "Cod11", price: 38000, desc: "Clásica, amplia y fácil de combinar. Una cartera pensada para convertirse en tu compañera favorita en cualquier ocasión.", medidas: "34 x 18 x 12 cm", stock: false, images: ["assets/classic-0.jpg", "assets/classic-2.jpg", "assets/classic-3.jpg", "assets/classic-4.jpg"] },
-  { name: "Bolso Wine", code: "Cod12", price: 42000, desc: "Es la tote bag perfecta si buscas amplitud, comodidad y estilo. Perfecta para destacar con sutileza.", medidas: "32 x 26 x 11 cm", stock: true, images: ["assets/wine-0.jpg", "assets/wine-2.jpg", "assets/wine-3.jpg"] },
-  { name: "Bag Mery (beige)", code: "Cod13", price: 38000, desc: "La combinación ideal entre comodidad y tendencia. Un accesorio pensado para acompañarte todos los días.", medidas: "20 x 12 x 8 cm", stock: true, images: ["assets/mery-beige-0.jpg", "assets/mery-beige-2.jpg", "assets/mery-beige-3.jpg", "assets/mery-beige-4.jpg", "assets/mery-beige-5.jpg"], stock: false },
-  { name: "Bag Emilia", code: "Cod14", price: 32000, desc: "Pequeña en tamaño, pero protagonista en estilo. Una mini bag versátil que complementa cualquier outfit con un toque sofisticado.", medidas: "20 x 13 x 11 cm", stock: false, images: ["assets/emilia-0.jpg", "assets/emilia-2.jpg", "assets/emilia-3.jpg", "assets/emilia-4.jpg", "assets/emilia-5.jpg"] },
-  { name: "Bag Fancy", code: "Cod15", price: 38000, desc: "Un diseño atemporal que combina amplitud, comodidad y sofisticación. Opción ideal para acompañarte todos los días con un estilo elegante.", medidas: "30 x 25 x 14 cm", stock: false, images: ["assets/fancy-0.jpg", "assets/fancy-2.png"] },
-  { name: "Bag Miley", code: "Cod16", price: 32000, desc: "Pensada para quienes aman los accesorios con actitud. Su diseño con hebillas hace de esta cartera el complemento perfecto para elevar cualquier look.", medidas: "39 x 22 x 8 cm", stock: true, images: ["assets/miley-0.jpg", "assets/miley-2.jpg", "assets/miley-3.jpg"], stock: false },
-  { name: "Bag Mora (beige)", code: "Cod17", price: 30000, desc: "Una bag más informal, pero sin dejar de brindar estilo. Planeada para acompañarte en cualquier ocasión, sus compartimentos la hacen práctica y cómoda.", medidas: "24 x 20 x 8 cm", stock: true, images: ["assets/mora-beige-0.jpg", "assets/mora-beige-2.jpg", "assets/mora-beige-3.jpg"], stock: false },
-  { name: "Bag Mora (negra)", code: "Cod18", price: 30000, desc: "Una bag más informal, pero sin dejar de brindar estilo. Planeada para acompañarte en cualquier ocasión, sus compartimentos la hacen práctica y cómoda.", medidas: "24 x 20 x 8 cm", stock: true, images: ["assets/mora-negra-0.jpg", "assets/mora-negra-2.jpg", "assets/mora-negra-3.jpg"], stock: false },
-];
+function normalizeProduct(raw, id) {
+  const images = (raw.images || [])
+    .map((im) => (typeof im === "string" ? im : im && im.url))
+    .filter(Boolean);
+  return {
+    id,
+    name: raw.name || "",
+    code: raw.code || "",
+    price: Number(raw.price) || 0,
+    desc: raw.desc || "",
+    medidas: raw.medidas || "",
+    stockQty: Math.max(0, Math.floor(Number(raw.stock) || 0)),
+    inStock: Number(raw.stock) > 0,
+    isNew: !!raw.isNew,
+    visible: raw.visible !== false,
+    sectionId: raw.sectionId || raw.section || null,
+    order: Number.isFinite(raw.order) ? raw.order : 0,
+    images,
+  };
+}
+
+async function loadFromFirebase() {
+  const { db } = await import("./firebase-init.js");
+  const { collection, getDocs, doc, getDoc } = await import(
+    "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore-lite.js"
+  );
+  const [secSnap, prodSnap, setSnap] = await Promise.all([
+    getDocs(collection(db, "sections")),
+    getDocs(collection(db, "products")),
+    getDoc(doc(db, "settings", "site")),
+  ]);
+  const sections = secSnap.docs.map((d) => ({ id: d.id, ...d.data() }));
+  const prods = prodSnap.docs.map((d) => normalizeProduct(d.data(), d.id));
+  const site = setSnap.exists() ? setSnap.data() : {};
+  return { sections, prods, site };
+}
+
+async function loadFromLegacy() {
+  const { LEGACY_SECTIONS, LEGACY_PRODUCTS, LEGACY_SETTINGS } = await import("./legacy-products.js");
+  const sections = LEGACY_SECTIONS.map((s, i) => ({ id: s.key, name: s.name, order: i, visible: true }));
+  const prods = LEGACY_PRODUCTS.map((p, i) => normalizeProduct({ ...p, order: i }, "legacy-" + i));
+  return { sections, prods, site: LEGACY_SETTINGS };
+}
+
+function buildGroups(sections, prods) {
+  const visibleSections = sections
+    .filter((s) => s.visible !== false)
+    .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+  const known = new Set(sections.map((s) => s.id));
+  const hiddenSections = new Set(sections.filter((s) => s.visible === false).map((s) => s.id));
+
+  products = prods.filter((p) => p.visible && !hiddenSections.has(p.sectionId));
+
+  // Dentro de cada sección: primero las disponibles, después las agotadas; luego por orden manual.
+  const sortIdx = (arr) =>
+    arr.sort((a, b) => {
+      const A = products[a], B = products[b];
+      if (A.inStock !== B.inStock) return A.inStock ? -1 : 1;
+      return A.order - B.order;
+    });
+
+  groups = visibleSections
+    .map((s) => ({
+      id: s.id,
+      name: s.name,
+      items: sortIdx(products.map((p, i) => i).filter((i) => products[i].sectionId === s.id)),
+    }))
+    .filter((g) => g.items.length);
+
+  const orphans = sortIdx(products.map((p, i) => i).filter((i) => !known.has(products[i].sectionId)));
+  if (orphans.length) groups.push({ id: "otros", name: groups.length ? "Más modelos" : "", items: orphans });
+}
+
+/* ———————————————— Utilidades ———————————————— */
+
+function esc(s) {
+  return String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+}
 
 function formatPrice(n) { return "$" + Math.round(n).toLocaleString("es-AR"); }
 
@@ -60,38 +106,33 @@ function bagPlaceholderSrc() {
   return "data:image/svg+xml," + encodeURIComponent(svg);
 }
 
-// Devuelve las fotos de un producto. Usa "images" si existe, si no cae al placeholder.
+// Devuelve las fotos de un producto (la primera es la portada). Si no tiene, usa el dibujo placeholder.
 function productImages(p) {
-  if (p.images && p.images.length) return p.images;
-  return [bagPlaceholderSrc()];
+  return p.images.length ? p.images : [bagPlaceholderSrc()];
 }
+
+function waNumber() { return String(settings.whatsapp || "").replace(/[^0-9]/g, ""); }
+
+function waLink(msg) { return "https://wa.me/" + waNumber() + "?text=" + encodeURIComponent(msg); }
 
 function whatsappUrl(p) {
-  const msg = SALUDO + "\n\n" + p.name + " - " + formatPrice(p.price);
-  return "https://wa.me/" + WHATSAPP_NUMBER.replace(/[^0-9]/g, "") + "?text=" + encodeURIComponent(msg);
+  return waLink((settings.saludo || "Hola! Me interesa esta cartera:") + "\n\n" + p.name + " - " + formatPrice(p.price));
 }
 
-function render() {
-  const root = document.getElementById("catalogo-list");
-  // Ordenamos solo para mostrar: primero las disponibles, después las agotadas.
-  // Usamos los índices originales del array "products" para que el modal,
-  // el link de WhatsApp y todo lo demás sigan funcionando igual.
-  const order = products
-    .map((p, i) => i)
-    .sort((a, b) => (products[a].stock === products[b].stock ? 0 : products[a].stock ? -1 : 1));
+/* ———————————————— Render del catálogo ———————————————— */
 
-  root.innerHTML = order.map((i, pos) => {
-    const p = products[i];
-    const url = whatsappUrl(p);
-    const rowClass = pos % 2 === 1 ? "rev" : "";
-    const tagClass = p.stock ? "tag-accent-2" : "tag-neutral";
-    const stockLabel = p.stock ? "Disponible" : "Agotado";
-    const thumb = productImages(p)[0];
-    return `
+function rowHtml(i, pos) {
+  const p = products[i];
+  const url = whatsappUrl(p);
+  const rowClass = pos % 2 === 1 ? "rev" : "";
+  const tagClass = p.inStock ? "tag-accent-2" : "tag-neutral";
+  const stockLabel = p.inStock ? "Disponible" : "Agotado";
+  const thumb = productImages(p)[0];
+  return `
       <div class="ab-wrap">
-        <div class="ab-row ${rowClass}" data-index="${i}" tabindex="0" role="button" aria-haspopup="dialog" aria-label="Ver detalle de ${p.name}">
-          <figure class="ab-photo${p.stock ? "" : " is-soldout"}" style="margin:0;">
-            <img src="${thumb}" alt="Foto de ${p.name}">
+        <div class="ab-row ${rowClass}" data-index="${i}" tabindex="0" role="button" aria-haspopup="dialog" aria-label="Ver detalle de ${esc(p.name)}">
+          <figure class="ab-photo${p.inStock ? "" : " is-soldout"}" style="margin:0;">
+            <img src="${esc(thumb)}" alt="Foto de ${esc(p.name)}" loading="${pos < 2 ? "eager" : "lazy"}">
             <span class="ab-photo-cue" aria-hidden="true">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
               Ver más
@@ -100,10 +141,11 @@ function render() {
           <div class="ab-info">
             <div class="ab-tag-row" style="display:flex;align-items:center;gap:var(--space-3);margin-bottom:var(--space-3);">
               <span class="tag ${tagClass}">${stockLabel}</span>
+              ${p.isNew ? `<span class="tag ab-tag-new">Nuevo</span>` : ""}
             </div>
-            <h2 class="ab-title" style="font-family:var(--font-heading);font-weight:var(--font-heading-weight);font-size:clamp(26px,3vw,36px);letter-spacing:0;margin:0;">${p.name}</h2>
-            <p class="ab-desc" style="font-size:15.5px;line-height:1.65;max-width:42ch;margin:var(--space-4) 0 0;color:color-mix(in srgb,var(--color-text) 78%,transparent);">${p.desc}</p>
-            <p class="ab-medidas" style="font-size:13px;margin:var(--space-3) 0 0;color:color-mix(in srgb,var(--color-text) 58%,transparent);">Medidas: ${p.medidas}</p>
+            <h2 class="ab-title" style="font-family:var(--font-heading);font-weight:var(--font-heading-weight);font-size:clamp(26px,3vw,36px);letter-spacing:0;margin:0;">${esc(p.name)}</h2>
+            <p class="ab-desc" style="font-size:15.5px;line-height:1.65;max-width:42ch;margin:var(--space-4) 0 0;color:color-mix(in srgb,var(--color-text) 78%,transparent);">${esc(p.desc)}</p>
+            ${p.medidas ? `<p class="ab-medidas" style="font-size:13px;margin:var(--space-3) 0 0;color:color-mix(in srgb,var(--color-text) 58%,transparent);">Medidas: ${esc(p.medidas)}</p>` : ""}
             <div class="ab-meta-row">
               <p class="ab-price" style="font-family:var(--font-heading);font-weight:var(--font-heading-weight);font-size:26px;color:var(--color-accent-700);margin:var(--space-5) 0 0;">${formatPrice(p.price)}</p>
               <div class="ab-mobile-more" aria-hidden="true">
@@ -111,13 +153,49 @@ function render() {
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
               </div>
             </div>
-            <a href="${url}" target="_blank" rel="noopener" class="btn btn-secondary js-wa-link ab-wa-btn" style="margin-top:var(--space-5);display:inline-flex;">Consultar por WhatsApp</a>
+            <a href="${esc(url)}" target="_blank" rel="noopener" class="btn btn-secondary js-wa-link ab-wa-btn" style="margin-top:var(--space-5);display:inline-flex;">Consultar por WhatsApp</a>
           </div>
         </div>
         <hr class="hr">
       </div>`;
+}
+
+function render() {
+  const root = document.getElementById("catalogo-list");
+  if (!groups.length) {
+    root.innerHTML = `<div class="ab-wrap"><p class="ab-catalog-msg">Pronto vas a ver nuestras carteras acá. Mientras tanto, <a href="${esc(waLink("Hola! Quiero consultar por el catálogo de Áurea Bags"))}" target="_blank" rel="noopener">escribinos por WhatsApp</a>.</p></div>`;
+    return;
+  }
+  const named = groups.filter((g) => g.name);
+  const chips = named.length > 1
+    ? `<div class="ab-wrap"><nav class="ab-section-chips" aria-label="Secciones del catálogo">${named
+        .map((g) => `<a href="#sec-${esc(g.id)}" class="ab-chip">${esc(g.name)}</a>`).join("")}</nav></div>`
+    : "";
+  root.innerHTML = chips + groups.map((g) => {
+    const head = g.name
+      ? `<div class="ab-wrap ab-section-head" id="sec-${esc(g.id)}"><h2 class="ab-section-title">${esc(g.name)}</h2><span class="ab-section-count">${g.items.length} ${g.items.length === 1 ? "modelo" : "modelos"}</span></div>`
+      : "";
+    return head + g.items.map((i, pos) => rowHtml(i, pos)).join("");
   }).join("");
 }
+
+function applySettings() {
+  const set = (id, val, prop = "textContent") => {
+    const el = document.getElementById(id);
+    if (el && val) el[prop] = val;
+  };
+  set("heroTitle", settings.heroTitle);
+  set("heroDesc", settings.heroDesc);
+  set("entregasTitle", settings.entregasTitle);
+  set("entregasDesc", settings.entregasDesc);
+  set("footerIgLink", settings.instagram, "href");
+  const ent = document.getElementById("entregasWaLink");
+  if (ent) ent.href = waLink("Hola! Quiero coordinar la entrega de mi pedido en Código Capital");
+  const foot = document.getElementById("footerWaLink");
+  if (foot) foot.href = waLink("Hola! Quiero consultar por el catálogo de Áurea Bags");
+}
+
+/* ———————————————— Navegación (menú mobile) ———————————————— */
 
 function setupNav() {
   const toggle = document.getElementById("navToggle");
@@ -136,15 +214,10 @@ function setupNav() {
   }
 
   toggle.addEventListener("click", () => {
-    const isOpen = links.classList.contains("is-open");
-    isOpen ? close() : open();
+    links.classList.contains("is-open") ? close() : open();
   });
-
   links.querySelectorAll("a").forEach((a) => a.addEventListener("click", close));
-
-  window.addEventListener("resize", () => {
-    if (window.innerWidth > 700) close();
-  });
+  window.addEventListener("resize", () => { if (window.innerWidth > 700) close(); });
 }
 
 /* ————————————————————————————————————————————
@@ -201,9 +274,7 @@ function buildModal() {
   };
 
   modalEls.closeBtn.addEventListener("click", closeModal);
-  modalEls.backdrop.addEventListener("click", (e) => {
-    if (e.target === modalEls.backdrop) closeModal();
-  });
+  modalEls.backdrop.addEventListener("click", (e) => { if (e.target === modalEls.backdrop) closeModal(); });
   modalEls.prevBtn.addEventListener("click", () => stepImage(-1));
   modalEls.nextBtn.addEventListener("click", () => stepImage(1));
 
@@ -220,7 +291,7 @@ function renderImage() {
   const imgs = productImages(p);
   modalEls.mainImg.src = imgs[currentImgIdx];
   modalEls.mainImg.alt = "Foto de " + p.name;
-  modalEls.mainImg.closest(".ab-modal-main").classList.toggle("is-soldout", !p.stock);
+  modalEls.mainImg.closest(".ab-modal-main").classList.toggle("is-soldout", !p.inStock);
 
   const showNav = imgs.length > 1;
   modalEls.prevBtn.style.display = showNav ? "flex" : "none";
@@ -228,7 +299,7 @@ function renderImage() {
   modalEls.thumbs.style.display = showNav ? "flex" : "none";
 
   modalEls.thumbs.innerHTML = imgs.map((src, i) =>
-    `<button type="button" class="ab-modal-thumb ${i === currentImgIdx ? "is-active" : ""}" data-i="${i}" aria-label="Foto ${i + 1}"><img src="${src}" alt=""></button>`
+    `<button type="button" class="ab-modal-thumb ${i === currentImgIdx ? "is-active" : ""}" data-i="${i}" aria-label="Foto ${i + 1}"><img src="${esc(src)}" alt=""></button>`
   ).join("");
 
   modalEls.thumbs.querySelectorAll(".ab-modal-thumb").forEach((btn) => {
@@ -240,8 +311,7 @@ function renderImage() {
 }
 
 function stepImage(dir) {
-  const p = products[currentIndex];
-  const imgs = productImages(p);
+  const imgs = productImages(products[currentIndex]);
   currentImgIdx = (currentImgIdx + dir + imgs.length) % imgs.length;
   renderImage();
 }
@@ -253,11 +323,11 @@ function openModal(index, triggerEl) {
   lastFocusedEl = triggerEl || document.activeElement;
 
   const p = products[index];
-  modalEls.tag.className = "tag " + (p.stock ? "tag-neutral" : "tag-outline");
-  modalEls.tag.textContent = p.stock ? "Disponible" : "Agotado";
+  modalEls.tag.className = "tag " + (p.inStock ? "tag-accent-2" : "tag-neutral");
+  modalEls.tag.textContent = p.inStock ? "Disponible" : "Agotado";
   modalEls.title.textContent = p.name;
   modalEls.desc.textContent = p.desc;
-  modalEls.medidas.textContent = "Medidas: " + p.medidas;
+  modalEls.medidas.textContent = p.medidas ? "Medidas: " + p.medidas : "";
   modalEls.price.innerHTML = `<span class="ab-currency">$</span>` + Math.round(p.price).toLocaleString("es-AR");
   modalEls.wa.href = whatsappUrl(p);
 
@@ -295,24 +365,27 @@ function setupProductModal() {
   });
 }
 
-function setupEntregasLink() {
-  const wa = document.getElementById("entregasWaLink");
-  if (!wa) return;
-  const msg = "Hola! Quiero coordinar la entrega de mi pedido en Código Capital";
-  wa.href = "https://wa.me/" + WHATSAPP_NUMBER.replace(/[^0-9]/g, "") + "?text=" + encodeURIComponent(msg);
-}
+/* ———————————————— Arranque ———————————————— */
 
-function setupFooterLinks() {
-  const wa = document.getElementById("footerWaLink");
-  if (!wa) return;
-  const msg = "Hola! Quiero consultar por el catálogo de Áurea Bags";
-  wa.href = "https://wa.me/" + WHATSAPP_NUMBER.replace(/[^0-9]/g, "") + "?text=" + encodeURIComponent(msg);
-}
-
-document.addEventListener("DOMContentLoaded", () => {
-  render();
+async function init() {
   setupNav();
   setupProductModal();
-  setupEntregasLink();
-  setupFooterLinks();
-});
+  applySettings();
+  const root = document.getElementById("catalogo-list");
+  root.innerHTML = `<div class="ab-wrap"><p class="ab-catalog-msg">Cargando catálogo…</p></div>`;
+  try {
+    let data = FIREBASE_READY ? await loadFromFirebase() : await loadFromLegacy();
+    // Si la base todavía está vacía (antes de importar desde /admin), mostramos los productos de siempre.
+    if (FIREBASE_READY && !data.prods.length && !data.sections.length) data = await loadFromLegacy();
+    settings = { ...settings, ...data.site };
+    buildGroups(data.sections, data.prods);
+    applySettings();
+    render();
+  } catch (err) {
+    console.error("[Áurea] No se pudo cargar el catálogo:", err);
+    root.innerHTML = `<div class="ab-wrap"><p class="ab-catalog-msg">No pudimos cargar el catálogo en este momento. Probá recargar la página o <a href="${esc(waLink("Hola! Quiero consultar por el catálogo de Áurea Bags"))}" target="_blank" rel="noopener">escribinos por WhatsApp</a>.</p></div>`;
+  }
+}
+
+if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
+else init();

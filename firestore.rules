@@ -1,0 +1,38 @@
+rules_version = '2';
+
+// Reglas de la base de datos (Firestore).
+// Cualquiera puede LEER el catálogo; solo el/los admin pueden ESCRIBIR.
+// 👉 Reemplazá el correo por el del usuario que creaste en Authentication (en minúsculas).
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isAdmin() {
+      return request.auth != null
+        && request.auth.token.email in ['admin@gmail.com'];
+    }
+
+    function validProduct() {
+      let d = request.resource.data;
+      return d.name is string && d.name.size() > 0 && d.name.size() < 200
+        && d.price is number && d.price >= 0
+        && d.stock is int && d.stock >= 0
+        && d.images is list && d.images.size() <= 20;
+    }
+
+    match /products/{id} {
+      allow read: if true;
+      allow create, update: if isAdmin() && validProduct();
+      allow delete: if isAdmin();
+    }
+
+    match /sections/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /settings/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+  }
+}

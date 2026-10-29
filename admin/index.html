@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Panel — Áurea Bags</title>
+<link rel="stylesheet" href="/ds-styles.css">
+<link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="/admin/admin.css">
+</head>
+<body class="adm">
+
+<!-- Firebase sin configurar -->
+<div id="setupView" class="adm-center" hidden>
+  <div class="adm-card adm-narrow">
+    <img src="/assets/logo-aurea-transparent.png" alt="" class="adm-logo">
+    <h1 class="adm-h1">Falta conectar Firebase</h1>
+    <p>Pegá la configuración de tu proyecto en <code>firebase-config.js</code> y recargá esta página. Los pasos están en <code>LEEME-PANEL.md</code>.</p>
+  </div>
+</div>
+
+<!-- Login -->
+<div id="loginView" class="adm-center" hidden>
+  <form id="loginForm" class="adm-card adm-narrow" novalidate>
+    <img src="/assets/logo-aurea-transparent.png" alt="" class="adm-logo">
+    <h1 class="adm-h1">Panel de Áurea Bags</h1>
+    <p class="adm-muted">Ingresá con tu usuario para administrar el catálogo.</p>
+    <label class="adm-field">
+      <span>Correo</span>
+      <input type="email" id="loginEmail" autocomplete="username" required>
+    </label>
+    <label class="adm-field">
+      <span>Contraseña</span>
+      <input type="password" id="loginPass" autocomplete="current-password" required>
+    </label>
+    <p id="loginError" class="adm-error" role="alert" hidden></p>
+    <button type="submit" class="btn btn-primary adm-full" id="loginBtn">Ingresar</button>
+    <button type="button" class="adm-link" id="forgotBtn">Olvidé mi contraseña</button>
+  </form>
+</div>
+
+<!-- App -->
+<div id="appView" hidden>
+  <header class="adm-top">
+    <div class="adm-top-inner">
+      <a href="/" class="adm-brand" target="_blank" rel="noopener" title="Ver la tienda">
+        <img src="/assets/logo-aurea-transparent.png" alt="">
+        <span>Áurea <em>Bags</em> · Panel</span>
+      </a>
+      <div class="adm-top-right">
+        <a href="/" target="_blank" rel="noopener" class="adm-btn adm-btn-ghost">Ver tienda ↗</a>
+        <span class="adm-user" id="userEmail"></span>
+        <button type="button" class="adm-btn adm-btn-ghost" id="logoutBtn">Salir</button>
+      </div>
+    </div>
+    <nav class="adm-tabs" role="tablist">
+      <button type="button" role="tab" class="adm-tab is-active" data-tab="products">Productos</button>
+      <button type="button" role="tab" class="adm-tab" data-tab="sections">Secciones</button>
+      <button type="button" role="tab" class="adm-tab" data-tab="settings">Ajustes del sitio</button>
+    </nav>
+  </header>
+
+  <main class="adm-main">
+
+    <!-- PRODUCTOS -->
+    <section id="tab-products" class="adm-panel">
+      <div id="migrateBanner" class="adm-banner" hidden>
+        <div>
+          <strong>Tu base de datos está vacía.</strong>
+          <p>Podés importar los <span id="legacyCount"></span> productos que hoy están en la página (con sus secciones, precios, fotos y stock) para empezar a administrarlos desde acá.</p>
+        </div>
+        <button type="button" class="btn btn-primary" id="migrateBtn">Importar productos actuales</button>
+      </div>
+
+      <div class="adm-toolbar">
+        <input type="search" id="prodSearch" class="adm-input" placeholder="Buscar por nombre o código…">
+        <select id="prodSectionFilter" class="adm-input"></select>
+        <select id="prodStockFilter" class="adm-input">
+          <option value="">Todo el stock</option>
+          <option value="in">Disponibles</option>
+          <option value="out">Agotados</option>
+          <option value="hidden">Ocultos</option>
+        </select>
+        <button type="button" class="btn btn-primary" id="newProductBtn">+ Nuevo producto</button>
+      </div>
+      <p class="adm-summary" id="prodSummary"></p>
+      <div id="productList" class="adm-list"></div>
+    </section>
+
+    <!-- SECCIONES -->
+    <section id="tab-sections" class="adm-panel" hidden>
+      <form id="newSectionForm" class="adm-toolbar">
+        <input type="text" id="newSectionName" class="adm-input adm-grow" placeholder="Nombre de la nueva sección (ej: Colección Verano)" required maxlength="80">
+        <button type="submit" class="btn btn-primary">+ Crear sección</button>
+      </form>
+      <p class="adm-muted adm-hint">Las secciones aparecen en la tienda en este orden. Usá las flechas para reordenarlas y el ojo para ocultarlas sin borrarlas.</p>
+      <div id="sectionList" class="adm-list"></div>
+    </section>
+
+    <!-- AJUSTES -->
+    <section id="tab-settings" class="adm-panel" hidden>
+      <form id="settingsForm" class="adm-card adm-form">
+        <h2 class="adm-h2">Contacto</h2>
+        <label class="adm-field">
+          <span>Número de WhatsApp <small>(con código de país, sin + ni espacios. Ej: 5493511234567)</small></span>
+          <input type="text" name="whatsapp" inputmode="numeric" class="adm-input">
+        </label>
+        <label class="adm-field">
+          <span>Mensaje inicial de WhatsApp <small>(se le agrega el nombre y precio de la cartera)</small></span>
+          <input type="text" name="saludo" class="adm-input" maxlength="200">
+        </label>
+        <label class="adm-field">
+          <span>Link de Instagram</span>
+          <input type="url" name="instagram" class="adm-input">
+        </label>
+
+        <h2 class="adm-h2">Textos de la página</h2>
+        <label class="adm-field">
+          <span>Título principal</span>
+          <input type="text" name="heroTitle" class="adm-input" maxlength="120" placeholder="Carteras que acompañan cada versión tuya.">
+        </label>
+        <label class="adm-field">
+          <span>Texto de bienvenida</span>
+          <textarea name="heroDesc" rows="3" class="adm-input" maxlength="500"></textarea>
+        </label>
+        <label class="adm-field">
+          <span>Título de entregas</span>
+          <input type="text" name="entregasTitle" class="adm-input" maxlength="120" placeholder="Coordinamos tu entrega en persona">
+        </label>
+        <label class="adm-field">
+          <span>Texto de entregas</span>
+          <textarea name="entregasDesc" rows="3" class="adm-input" maxlength="500"></textarea>
+        </label>
+        <p class="adm-muted">Si dejás un texto vacío, se usa el que viene por defecto en la página.</p>
+        <div class="adm-actions">
+          <button type="submit" class="btn btn-primary">Guardar ajustes</button>
+        </div>
+      </form>
+    </section>
+  </main>
+</div>
+
+<!-- Editor de producto -->
+<dialog id="productDialog" class="adm-dialog">
+  <form id="productForm" method="dialog" novalidate>
+    <header class="adm-dialog-head">
+      <h2 class="adm-h2" id="productDialogTitle">Nuevo producto</h2>
+      <button type="button" class="adm-x" data-close aria-label="Cerrar">&times;</button>
+    </header>
+
+    <div class="adm-dialog-body">
+      <div class="adm-photos">
+        <div class="adm-photos-head">
+          <h3>Fotos</h3>
+          <label class="adm-btn adm-btn-ghost adm-upload">
+            + Agregar fotos
+            <input type="file" id="photoInput" accept="image/*" multiple hidden>
+          </label>
+        </div>
+        <p class="adm-muted adm-small">La primera foto es la <strong>portada</strong>. Las fotos se achican solas antes de subirse.</p>
+        <div id="photoGrid" class="adm-photo-grid"></div>
+        <div id="photoDrop" class="adm-drop">Arrastrá fotos acá</div>
+      </div>
+
+      <div class="adm-fields">
+        <label class="adm-field">
+          <span>Nombre *</span>
+          <input type="text" name="name" class="adm-input" required maxlength="120" placeholder="Bag Luna">
+        </label>
+        <div class="adm-row2">
+          <label class="adm-field">
+            <span>Precio *</span>
+            <input type="text" name="price" class="adm-input" inputmode="numeric" required placeholder="40.000">
+          </label>
+          <label class="adm-field">
+            <span>Stock (unidades) *</span>
+            <div class="adm-stepper">
+              <button type="button" data-step="-1" aria-label="Restar uno">−</button>
+              <input type="number" name="stock" min="0" step="1" class="adm-input" value="0">
+              <button type="button" data-step="1" aria-label="Sumar uno">+</button>
+            </div>
+          </label>
+        </div>
+        <div class="adm-row2">
+          <label class="adm-field">
+            <span>Sección</span>
+            <select name="sectionId" class="adm-input"></select>
+          </label>
+          <label class="adm-field">
+            <span>Código</span>
+            <input type="text" name="code" class="adm-input" maxlength="40" placeholder="Cod35">
+          </label>
+        </div>
+        <label class="adm-field">
+          <span>Medidas</span>
+          <input type="text" name="medidas" class="adm-input" maxlength="80" placeholder="25 x 16 x 9 cm">
+        </label>
+        <label class="adm-field">
+          <span>Descripción</span>
+          <textarea name="desc" rows="5" class="adm-input" maxlength="1500"></textarea>
+        </label>
+        <div class="adm-checks">
+          <label><input type="checkbox" name="visible" checked> Visible en la tienda</label>
+          <label><input type="checkbox" name="isNew"> Mostrar etiqueta “Nuevo”</label>
+        </div>
+      </div>
+    </div>
+
+    <footer class="adm-dialog-foot">
+      <button type="button" class="adm-btn adm-btn-danger" id="deleteProductBtn">Eliminar</button>
+      <span class="adm-grow"></span>
+      <span class="adm-muted adm-small" id="saveStatus"></span>
+      <button type="button" class="adm-btn adm-btn-ghost" data-close>Cancelar</button>
+      <button type="submit" class="btn btn-primary" id="saveProductBtn">Guardar</button>
+    </footer>
+  </form>
+</dialog>
+
+<div id="toast" class="adm-toast" role="status" aria-live="polite" hidden></div>
+
+<script type="module" src="/admin/admin.js"></script>
+</body>
+</html>

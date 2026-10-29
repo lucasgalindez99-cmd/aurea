@@ -1,0 +1,17 @@
+rules_version = '2';
+
+// Reglas de las fotos (Cloud Storage).
+// Cualquiera puede VER las fotos; solo el/los admin pueden subir o borrar.
+// 👉 Usá el mismo correo que en firestore.rules.
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /products/{allPaths=**} {
+      allow read: if true;
+      allow write: if request.auth != null
+        && request.auth.token.email in ['admin@gmail.com']
+        && (request.resource == null
+            || (request.resource.size < 5 * 1024 * 1024
+                && request.resource.contentType.matches('image/.*')));
+    }
+  }
+}

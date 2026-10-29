@@ -1,0 +1,167 @@
+/* Panel de administración — usa los mismos colores y fuentes de la tienda */
+.adm { background: var(--color-bg); min-height: 100vh; font-size: 15px; }
+.adm [hidden] { display: none !important; }
+.adm code { background: var(--color-accent-100); padding: 1px 6px; border-radius: 4px; font-size: .92em; }
+.adm-muted { color: color-mix(in srgb, var(--color-text) 60%, transparent); }
+.adm-small { font-size: 12.5px; }
+.adm-nowrap { white-space: nowrap; }
+.adm-grow { flex: 1 1 auto; }
+.adm-h1 { font-family: var(--font-product); font-weight: 500; font-size: 28px; margin: var(--space-2) 0; }
+.adm-h2 { font-family: var(--font-product); font-weight: 500; font-size: 22px; margin: 0; }
+
+.adm-card { background: #fff; border: 1px solid var(--color-divider); border-radius: 14px; padding: clamp(20px, 4vw, 32px); box-shadow: 0 1px 2px rgba(0,0,0,.04); }
+.adm-narrow { width: min(420px, 100%); }
+.adm-center { min-height: 100vh; display: grid; place-items: center; padding: 16px; box-sizing: border-box; }
+.adm-logo { height: 64px; width: auto; display: block; }
+.adm-full { width: 100%; justify-content: center; margin-top: var(--space-4); }
+.adm-link { background: none; border: 0; color: var(--color-accent-700); padding: 0; margin-top: var(--space-4); cursor: pointer; font: inherit; font-size: 14px; display: block; }
+.adm-link:hover { text-decoration: underline; }
+.adm-error { color: #b42318; background: #fef3f2; border: 1px solid #fecdca; padding: 10px 12px; border-radius: 8px; font-size: 14px; margin: var(--space-3) 0 0; }
+
+/* Campos */
+.adm-field { display: flex; flex-direction: column; gap: 6px; margin-top: var(--space-4); font-size: 13.5px; font-weight: 600; }
+.adm-field small { font-weight: 400; color: color-mix(in srgb, var(--color-text) 55%, transparent); }
+.adm-field input, .adm-field textarea, .adm-field select, .adm-input {
+  font: inherit; font-weight: 400; font-size: 15px; color: var(--color-text);
+  background: #fff; border: 1px solid color-mix(in srgb, var(--color-text) 22%, transparent);
+  border-radius: 8px; padding: 10px 12px; min-height: 42px; box-sizing: border-box; width: 100%;
+}
+.adm-field textarea, textarea.adm-input { resize: vertical; line-height: 1.5; }
+.adm-input:focus, .adm-field input:focus, .adm-field textarea:focus, .adm-field select:focus {
+  outline: 2px solid var(--color-accent); outline-offset: 0; border-color: var(--color-accent);
+}
+.adm-row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0 var(--space-4); }
+.adm-checks { display: flex; flex-wrap: wrap; gap: var(--space-4); margin-top: var(--space-4); font-size: 14px; }
+.adm-checks label { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+.adm-checks input { width: 18px; height: 18px; accent-color: var(--color-accent-2); }
+
+/* Botones */
+.adm .btn { border-radius: 8px; cursor: pointer; }
+.adm-btn { font: inherit; font-size: 14px; display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; min-height: 38px; border-radius: 8px; border: 1px solid transparent; cursor: pointer; background: none; color: var(--color-text); text-decoration: none; white-space: nowrap; box-sizing: border-box; }
+.adm-btn-ghost { border-color: color-mix(in srgb, var(--color-text) 20%, transparent); background: #fff; }
+.adm-btn-ghost:hover { border-color: var(--color-accent); color: var(--color-accent-700); text-decoration: none; }
+.adm-btn-danger { color: #b42318; border-color: #fecdca; background: #fff; }
+.adm-btn-danger:hover { background: #fef3f2; }
+.adm-icon { font: inherit; width: 36px; height: 36px; display: inline-grid; place-items: center; border-radius: 8px; border: 1px solid color-mix(in srgb, var(--color-text) 16%, transparent); background: #fff; cursor: pointer; color: var(--color-text); font-size: 16px; padding: 0; }
+.adm-icon:hover:not(:disabled) { border-color: var(--color-accent); color: var(--color-accent-700); }
+.adm-icon:disabled { opacity: .35; cursor: default; }
+.adm-icon.is-danger:hover { border-color: #fda29b; background: #fef3f2; }
+
+/* Barra superior */
+.adm-top { position: sticky; top: 0; z-index: 20; background: var(--color-bg); border-bottom: 1px solid var(--color-divider); }
+.adm-top-inner { max-width: 1180px; margin: 0 auto; padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.adm-brand { display: flex; align-items: center; gap: 10px; color: var(--color-text); font-family: var(--font-product); font-size: 19px; }
+.adm-brand:hover { text-decoration: none; color: var(--color-text); }
+.adm-brand img { height: 38px; width: auto; }
+.adm-top-right { display: flex; align-items: center; gap: 10px; }
+.adm-user { font-size: 13px; color: color-mix(in srgb, var(--color-text) 60%, transparent); }
+.adm-tabs { max-width: 1180px; margin: 0 auto; padding: 0 16px; display: flex; gap: 4px; overflow-x: auto; }
+.adm-tab { font: inherit; font-size: 14.5px; font-weight: 600; background: none; border: 0; border-bottom: 3px solid transparent; padding: 10px 14px; cursor: pointer; color: color-mix(in srgb, var(--color-text) 60%, transparent); white-space: nowrap; }
+.adm-tab.is-active { color: var(--color-text); border-bottom-color: var(--color-accent); }
+
+.adm-main { max-width: 1180px; margin: 0 auto; padding: 24px 16px 80px; }
+.adm-toolbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.adm-toolbar .adm-input { width: auto; flex: 1 1 180px; }
+.adm-toolbar #prodSearch { flex: 2 1 240px; }
+.adm-toolbar .btn { flex: 0 0 auto; }
+.adm-summary { margin: 14px 0 0; font-size: 13.5px; color: color-mix(in srgb, var(--color-text) 60%, transparent); }
+.adm-hint { margin: 12px 0 0; font-size: 13.5px; }
+
+.adm-banner { display: flex; gap: 16px; align-items: center; justify-content: space-between; background: var(--color-accent-100); border: 1px solid var(--color-accent-300); border-radius: 14px; padding: 18px 20px; margin-bottom: 20px; }
+.adm-banner p { margin: 4px 0 0; font-size: 14px; }
+
+/* Listados */
+.adm-list { margin-top: 8px; }
+.adm-group { font-family: var(--font-product); font-weight: 500; font-size: 20px; margin: 26px 0 10px; }
+.adm-badge { display: inline-block; font-size: 11.5px; font-weight: 600; letter-spacing: .02em; padding: 2px 8px; border-radius: 999px; background: var(--color-neutral-200); color: var(--color-neutral-800); font-family: var(--font-body); vertical-align: middle; }
+.adm-badge.is-in { background: var(--color-accent-2-100); color: var(--color-accent-2-800); }
+.adm-badge.is-out { background: #fef3f2; color: #b42318; }
+.adm-badge.is-new { background: var(--color-accent-100); color: var(--color-accent-700); }
+.adm-badges { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px; }
+.adm-empty { padding: 40px 20px; text-align: center; border: 1px dashed var(--color-divider); border-radius: 14px; color: color-mix(in srgb, var(--color-text) 60%, transparent); margin-top: 16px; }
+
+.adm-item { display: grid; grid-template-columns: 64px minmax(0, 1fr) 140px 150px auto; gap: 16px; align-items: center; background: #fff; border: 1px solid var(--color-divider); border-radius: 12px; padding: 10px 12px; margin-bottom: 8px; cursor: pointer; transition: border-color .15s; }
+.adm-item:hover { border-color: var(--color-accent-300); }
+.adm-item.is-hidden { opacity: .6; }
+.adm-thumb { width: 64px; height: 80px; border-radius: 8px; overflow: hidden; background: var(--color-accent-100); display: grid; place-items: center; font-size: 11px; color: var(--color-accent-700); text-align: center; }
+.adm-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.adm-item-main { display: flex; flex-direction: column; min-width: 0; }
+.adm-item-main strong { font-size: 15.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.adm-item-price, .adm-item-stock { display: flex; flex-direction: column; gap: 4px; cursor: default; }
+.adm-price-input { display: flex; align-items: center; gap: 4px; border: 1px solid color-mix(in srgb, var(--color-text) 22%, transparent); border-radius: 8px; padding: 0 10px; height: 38px; background: #fff; }
+.adm-price-input:focus-within { outline: 2px solid var(--color-accent); border-color: var(--color-accent); }
+.adm-price-input input { border: 0; outline: 0; font: inherit; width: 100%; min-width: 0; background: none; padding: 0; }
+.adm-item-actions { display: flex; gap: 6px; align-items: center; justify-content: flex-end; }
+
+.adm-stepper { display: flex; align-items: stretch; border: 1px solid color-mix(in srgb, var(--color-text) 22%, transparent); border-radius: 8px; overflow: hidden; background: #fff; height: 42px; }
+.adm-stepper button { font: inherit; font-size: 18px; width: 40px; border: 0; background: var(--color-accent-100); cursor: pointer; color: var(--color-accent-700); flex: 0 0 auto; }
+.adm-stepper button:hover:not(:disabled) { background: var(--color-accent-300); }
+.adm-stepper button:disabled { opacity: .35; cursor: default; }
+.adm-stepper input { border: 0 !important; outline: 0; text-align: center; font: inherit; width: 100%; min-width: 0; padding: 0 !important; border-radius: 0 !important; min-height: 0 !important; -moz-appearance: textfield; }
+.adm-stepper input::-webkit-outer-spin-button, .adm-stepper input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.adm-stepper-sm { height: 38px; }
+.adm-stepper-sm button { width: 36px; }
+
+.adm-section-item { grid-template-columns: 32px minmax(0, 1fr) auto auto; cursor: default; }
+.adm-order { width: 28px; height: 28px; border-radius: 999px; background: var(--color-accent-100); color: var(--color-accent-700); display: grid; place-items: center; font-size: 13px; font-weight: 700; }
+
+.adm-form { max-width: 720px; }
+.adm-form .adm-h2 { margin-top: var(--space-6); }
+.adm-form .adm-h2:first-child { margin-top: 0; }
+.adm-actions { display: flex; justify-content: flex-end; margin-top: var(--space-6); }
+
+/* Editor de producto */
+.adm-dialog { width: min(1040px, calc(100vw - 24px)); max-height: calc(100vh - 24px); padding: 0; border: 0; border-radius: 16px; background: var(--color-bg); color: var(--color-text); box-shadow: 0 20px 60px rgba(0,0,0,.25); }
+.adm-dialog::backdrop { background: rgba(20, 16, 10, .45); }
+.adm-dialog form { display: flex; flex-direction: column; max-height: calc(100vh - 24px); }
+.adm-dialog-head { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid var(--color-divider); }
+.adm-x { font-size: 28px; line-height: 1; background: none; border: 0; cursor: pointer; color: var(--color-text); padding: 0 4px; }
+.adm-dialog-body { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 28px; padding: 8px 20px 20px; overflow-y: auto; }
+.adm-dialog-foot { display: flex; align-items: center; gap: 10px; padding: 14px 20px; border-top: 1px solid var(--color-divider); background: #fff; border-radius: 0 0 16px 16px; flex-wrap: wrap; }
+
+.adm-photos-head { display: flex; align-items: center; justify-content: space-between; margin-top: var(--space-4); }
+.adm-photos-head h3 { margin: 0; font-size: 15px; }
+.adm-photos p { margin: 6px 0 12px; }
+.adm-upload { cursor: pointer; }
+.adm-photo-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.adm-photo { position: relative; aspect-ratio: 4 / 5; border-radius: 10px; overflow: hidden; background: var(--color-accent-100); border: 2px solid transparent; }
+.adm-photo.is-cover { border-color: var(--color-accent); grid-column: span 2; grid-row: span 2; }
+.adm-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.adm-photo-badge { position: absolute; top: 8px; left: 8px; background: var(--color-accent-700); color: #fff; font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 999px; letter-spacing: .03em; }
+.adm-photo-badge.is-pending { left: auto; right: 8px; background: var(--color-accent-2); }
+.adm-photo-tools { position: absolute; left: 0; right: 0; bottom: 0; display: flex; justify-content: center; gap: 4px; padding: 6px; background: linear-gradient(transparent, rgba(0,0,0,.55)); }
+.adm-photo-tools button { width: 30px; height: 30px; border-radius: 999px; border: 0; background: rgba(255,255,255,.92); cursor: pointer; font-size: 15px; display: grid; place-items: center; padding: 0; color: #222; }
+.adm-photo-tools button:disabled { opacity: .35; cursor: default; }
+.adm-photo-tools button.is-danger:hover { background: #fee4e2; color: #b42318; }
+.adm-drop { margin-top: 10px; border: 2px dashed var(--color-accent-300); border-radius: 12px; padding: 48px 16px; text-align: center; color: var(--color-accent-700); font-size: 14px; }
+.adm-drop.is-over, .adm-photos:has(.adm-drop.is-over) .adm-photo-grid { background: var(--color-accent-100); }
+
+/* Aviso flotante */
+.adm-toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); z-index: 100; max-width: min(560px, calc(100vw - 32px)); padding: 12px 18px; border-radius: 10px; font-size: 14.5px; box-shadow: 0 8px 30px rgba(0,0,0,.18); background: var(--color-accent-2-700); color: #fff; }
+.adm-toast.is-error { background: #b42318; }
+
+/* Mobile */
+@media (max-width: 900px) {
+  .adm-item { grid-template-columns: 56px minmax(0, 1fr) 120px; grid-template-areas: "thumb main main" "thumb price stock" "actions actions actions"; gap: 10px 12px; }
+  .adm-thumb { grid-area: thumb; width: 56px; height: 70px; align-self: start; }
+  .adm-item-main { grid-area: main; }
+  .adm-item-price { grid-area: price; }
+  .adm-item-stock { grid-area: stock; }
+  .adm-item-actions { grid-area: actions; justify-content: flex-start; }
+  .adm-item-actions .adm-btn { margin-left: auto; }
+  .adm-section-item { grid-template-columns: 28px minmax(0, 1fr); grid-template-areas: none; }
+  .adm-section-item .adm-item-actions { grid-column: 1 / -1; }
+  .adm-section-item > .adm-small { grid-column: 2; }
+  .adm-dialog-body { grid-template-columns: 1fr; gap: 0; }
+}
+@media (max-width: 560px) {
+  .adm-user { display: none; }
+  .adm-brand span { display: none; }
+  .adm-banner { flex-direction: column; align-items: stretch; }
+  .adm-row2 { grid-template-columns: 1fr; }
+  .adm-toolbar .adm-input, .adm-toolbar .btn { flex: 1 1 100%; }
+  .adm-dialog { width: 100vw; max-width: 100vw; max-height: 100dvh; height: 100dvh; border-radius: 0; margin: 0; }
+  .adm-dialog form { max-height: 100dvh; height: 100%; }
+  .adm-dialog-body { flex: 1 1 auto; }
+  .adm-dialog-foot { border-radius: 0; }
+}
