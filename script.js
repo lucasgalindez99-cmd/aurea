@@ -88,6 +88,16 @@ function buildGroups(sections, prods) {
 
   const orphans = sortIdx(products.map((p, i) => i).filter((i) => !known.has(products[i].sectionId)));
   if (orphans.length) groups.push({ id: "otros", name: "Más modelos", slug: "mas-modelos", items: orphans });
+
+  // Cada producto tiene su propio link: ?seccion=...&producto=nombre-del-producto
+  const used = new Set();
+  products.forEach((p) => {
+    let base = slugify(p.name) || p.id, slug = base, n = 2;
+    while (used.has(slug)) slug = base + "-" + n++;
+    used.add(slug);
+    p.slug = slug;
+  });
+  groups.forEach((g) => g.items.forEach((i) => (products[i].groupSlug = g.slug)));
 }
 
 /* ════════════════ Utilidades ════════════════ */
@@ -152,7 +162,7 @@ function cardHtml(i, pos) {
     <button type="button" class="card${p.inStock ? "" : " is-out"}" data-index="${i}" aria-haspopup="dialog">
       <span class="card-media">
         <img class="main" src="${esc(imgs[0])}" alt="${esc(p.name)}" loading="${lazy}">
-        ${imgs[1] ? `<img class="alt" src="${esc(imgs[1])}" alt="" loading="lazy">` : ""}
+        ${imgs[1] && p.inStock ? `<img class="alt" src="${esc(imgs[1])}" alt="" loading="lazy">` : ""}
         ${p.isNew && p.inStock ? `<span class="card-flag">Nuevo</span>` : ""}
         ${p.inStock ? "" : `<span class="card-flag is-out">Agotada</span>`}
       </span>
@@ -215,6 +225,16 @@ function applySettings() {
 /* ════════════════ Secciones como pestañas ════════════════ */
 
 const slugFromUrl = () => new URLSearchParams(location.search).get("seccion");
+const productFromUrl = () => {
+  const slug = new URLSearchParams(location.search).get("producto");
+  return slug ? products.findIndex((p) => p.slug === slug || p.id === slug) : -1;
+};
+function sectionUrl(slug) {
+  return "?seccion=" + encodeURIComponent(slug || activeSlug || "");
+}
+function productUrl(p) {
+  return "?seccion=" + encodeURIComponent(p.groupSlug || activeSlug || "") + "&producto=" + encodeURIComponent(p.slug);
+}
 
 function setupSectionTabs() {
   const root = document.getElementById("catalogo-list");
@@ -232,8 +252,15 @@ function setupSectionTabs() {
   });
   window.addEventListener("popstate", () => {
     if (!groups.length) return;
-    activeSlug = slugFromUrl();
-    render(true);
+    const sec = slugFromUrl();
+    const target = groups.some((g) => g.slug === sec) ? sec : groups[0].slug;
+    if (target !== activeSlug) {
+      activeSlug = target;
+      render(true);
+    }
+    const idx = productFromUrl();
+    if (idx >= 0) openModal(idx, null, { push: false });
+    else closeModal({ fromHistory: true });
   });
 }
 
@@ -291,6 +318,7 @@ function setupBrandHandoff() {
 /* ════════════════ Ficha del producto ════════════════ */
 
 let pd = null;
+const baseTitle = document.title;
 let current = 0;
 let lastFocused = null;
 
@@ -309,7 +337,10 @@ function buildModal() {
         <div class="pd-thumbs"></div>
       </div>
       <div class="pd-info">
-        <div class="pd-flags"></div>
+        <div class="pd-top">
+          <div class="pd-flags"></div>
+          <button type="button" class="pd-share"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 8l5-5 5 5"/><path d="M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/></svg><span>Compartir</span></button>
+        </div>
         <h2 class="pd-name" id="pdName"></h2>
         <p class="pd-price"></p>
         <p class="pd-desc"></p>
@@ -328,9 +359,11 @@ function buildModal() {
     prev: q(".pd-arrow.prev"), next: q(".pd-arrow.next"), dots: q(".pd-dots"), thumbs: q(".pd-thumbs"),
     flags: q(".pd-flags"), name: q(".pd-name"), price: q(".pd-price"), desc: q(".pd-desc"),
     specs: q(".pd-specs"), wa: q(".pd-wa"), waLabel: q(".pd-wa span"),
+    share: q(".pd-share"), shareLabel: q(".pd-share span"),
   };
+  pd.share.addEventListener("click", shareProduct);
 
-  pd.close.addEventListener("click", closeModal);
+  pd.close.addEventListener("click", () => closeModal());
   wrap.addEventListener("click", (e) => { if (e.target === wrap) closeModal(); });
   pd.prev.addEventListener("click", () => goTo(currentSlide() - 1));
   pd.next.addEventListener("click", () => goTo(currentSlide() + 1));
@@ -347,7 +380,7 @@ function buildModal() {
   document.addEventListener("keydown", (e) => {
     if (pd.backdrop.hidden) return;
     if (e.key === "Escape") closeModal();
-    if (e.key === "ArrowRight") goTo(currentSlide() + 1);
+    if (e.key === "ArrowRight" && document.activeElement !== pd.share) goTo(currentSlide() + 1);
     if (e.key === "ArrowLeft") goTo(currentSlide() - 1);
     if (e.key === "Tab") {
       const f = [...pd.box.querySelectorAll("button, a[href]")].filter((el) => el.offsetParent !== null);
@@ -373,8 +406,31 @@ function markSlide() {
   [...pd.dots.children].forEach((d, k) => d.classList.toggle("is-active", k === i));
 }
 
-function openModal(index, trigger) {
+async function shareProduct() {
+  const p = products[current];
+  const url = location.origin + location.pathname + productUrl(p);
+  try {
+    if (navigator.share) {
+      await navigator.share({ title: p.name + " · Áurea Bags", text: p.name + " - " + formatPrice(p.price), url });
+      return;
+    }
+    await navigator.clipboard.writeText(url);
+    pd.shareLabel.textContent = "Link copiado";
+  } catch (err) {
+    if (err && err.name === "AbortError") return; // la persona cerró el menú de compartir
+    window.prompt("Copiá el link de esta cartera:", url);
+  }
+  setTimeout(() => { if (pd) pd.shareLabel.textContent = "Compartir"; }, 2200);
+}
+
+function openModal(index, trigger, { push = true } = {}) {
   if (!pd) buildModal();
+  if (push) {
+    const p0 = products[index];
+    const already = new URLSearchParams(location.search).get("producto") === p0.slug;
+    if (!already) history.pushState({ producto: p0.slug }, "", productUrl(p0));
+  }
+  document.title = products[index].name + " · Áurea Bags";
   current = index;
   lastFocused = trigger || document.activeElement;
   const p = products[index];
@@ -407,8 +463,14 @@ function openModal(index, trigger) {
   pd.close.focus({ preventScroll: true });
 }
 
-function closeModal() {
+function closeModal({ fromHistory = false } = {}) {
   if (!pd || pd.backdrop.hidden) return;
+  document.title = baseTitle;
+  if (!fromHistory) {
+    // Si la ficha se abrió desde la tienda, "atrás" la cierra; si se entró con el link directo, solo limpiamos la URL.
+    if (history.state && history.state.producto) { history.back(); return; }
+    history.replaceState(null, "", sectionUrl());
+  }
   pd.backdrop.classList.remove("is-open");
   document.body.style.overflow = "";
   setTimeout(() => { pd.backdrop.hidden = true; }, 250);
@@ -437,9 +499,12 @@ async function init() {
     settings = { ...settings, ...data.site };
     buildGroups(data.sections, data.prods);
     activeSlug = slugFromUrl();
+    const linked = productFromUrl();
+    if (linked >= 0 && products[linked].groupSlug) activeSlug = products[linked].groupSlug;
     applySettings();
     renderHero();
     render();
+    if (linked >= 0) openModal(linked, null, { push: false });
   } catch (err) {
     console.error("[Áurea] No se pudo cargar el catálogo:", err);
     document.getElementById("catalogo-list").innerHTML = `<p class="catalog-msg">La colección no cargó. Revisá tu conexión y recargá la página, o <a href="${esc(waLink("Hola! Quiero consultar por el catálogo de Áurea Bags"))}" target="_blank" rel="noopener">escribinos por WhatsApp</a>.</p>`;
