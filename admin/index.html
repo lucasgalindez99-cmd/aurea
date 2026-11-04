@@ -74,6 +74,18 @@
         <button type="button" class="btn btn-primary" id="migrateBtn">Importar productos actuales</button>
       </div>
 
+      <div class="adm-promo">
+        <div>
+          <strong>Descuentos</strong>
+          <p class="adm-muted adm-small" id="promoStatus"></p>
+        </div>
+        <div class="adm-promo-form">
+          <span class="adm-price-input adm-off-input"><input type="number" id="bulkOff" min="1" max="90" step="1" placeholder="20" aria-label="Porcentaje de descuento">%</span>
+          <button type="button" class="adm-btn adm-btn-ghost" id="bulkApply">Aplicar a los de la lista</button>
+          <button type="button" class="adm-btn adm-btn-ghost" id="bulkClear">Quitar a los de la lista</button>
+        </div>
+      </div>
+
       <div class="adm-toolbar">
         <input type="search" id="prodSearch" class="adm-input" placeholder="Buscar por nombre o código…">
         <select id="prodSectionFilter" class="adm-input"></select>
@@ -82,6 +94,7 @@
           <option value="in">Disponibles</option>
           <option value="out">Agotados</option>
           <option value="hidden">Ocultos</option>
+          <option value="sale">Con descuento</option>
         </select>
         <button type="button" class="btn btn-primary" id="newProductBtn">+ Nuevo producto</button>
       </div>
@@ -115,6 +128,32 @@
           <span>Link de Instagram</span>
           <input type="url" name="instagram" class="adm-input">
         </label>
+
+        <h2 class="adm-h2">Cyber Monday / promo</h2>
+        <p class="adm-muted">Con la promo activa, arriba de la tienda corre una cinta con este texto, la portada muestra la cuenta regresiva y las carteras con descuento llevan el sello y el precio tachado. Se apaga sola al llegar la fecha de fin.</p>
+        <div class="adm-checks">
+          <label><input type="checkbox" name="promoOn"> Promo activa</label>
+        </div>
+        <div class="adm-row2">
+          <label class="adm-field">
+            <span>Nombre de la promo</span>
+            <input type="text" name="promoTitle" class="adm-input" maxlength="40" placeholder="Cyber Monday">
+          </label>
+          <label class="adm-field">
+            <span>Texto de la cinta</span>
+            <input type="text" name="promoText" class="adm-input" maxlength="90" placeholder="Hasta 30% off en carteras elegidas">
+          </label>
+        </div>
+        <div class="adm-row2">
+          <label class="adm-field">
+            <span>Empieza <small>(si lo dejás vacío, empieza ya)</small></span>
+            <input type="datetime-local" name="promoStart" class="adm-input">
+          </label>
+          <label class="adm-field">
+            <span>Termina *</span>
+            <input type="datetime-local" name="promoEnd" class="adm-input">
+          </label>
+        </div>
 
         <h2 class="adm-h2">Textos de la página</h2>
         <label class="adm-field">
@@ -193,10 +232,17 @@
             <input type="text" name="code" class="adm-input" maxlength="40" placeholder="Cod35">
           </label>
         </div>
-        <label class="adm-field">
-          <span>Medidas</span>
-          <input type="text" name="medidas" class="adm-input" maxlength="80" placeholder="25 x 16 x 9 cm">
-        </label>
+        <div class="adm-row2">
+          <label class="adm-field">
+            <span>Medidas</span>
+            <input type="text" name="medidas" class="adm-input" maxlength="80" placeholder="25 x 16 x 9 cm">
+          </label>
+          <label class="adm-field">
+            <span>Descuento % <small>(solo durante la promo)</small></span>
+            <input type="number" name="discount" class="adm-input" min="0" max="90" step="1" placeholder="0">
+            <small id="discountHint"></small>
+          </label>
+        </div>
         <label class="adm-field">
           <span>Descripción</span>
           <textarea name="desc" rows="5" class="adm-input" maxlength="1500"></textarea>

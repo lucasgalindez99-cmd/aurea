@@ -16,7 +16,8 @@ service cloud.firestore {
       return d.name is string && d.name.size() > 0 && d.name.size() < 200
         && d.price is number && d.price >= 0
         && d.stock is int && d.stock >= 0
-        && d.images is list && d.images.size() <= 20;
+        && d.images is list && d.images.size() <= 20
+        && (!('discount' in d) || (d.discount is int && d.discount >= 0 && d.discount <= 90));
     }
 
     match /products/{id} {

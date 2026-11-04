@@ -81,14 +81,14 @@
 .adm-badges { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px; }
 .adm-empty { padding: 40px 20px; text-align: center; border: 1px dashed var(--color-divider); border-radius: 14px; color: color-mix(in srgb, var(--color-text) 60%, transparent); margin-top: 16px; }
 
-.adm-item { display: grid; grid-template-columns: 64px minmax(0, 1fr) 140px 150px auto; gap: 16px; align-items: center; background: #fff; border: 1px solid var(--color-divider); border-radius: 12px; padding: 10px 12px; margin-bottom: 8px; cursor: pointer; transition: border-color .15s; }
+.adm-item { display: grid; grid-template-columns: 64px minmax(0, 1fr) 130px 84px 150px auto; gap: 16px; align-items: center; background: #fff; border: 1px solid var(--color-divider); border-radius: 12px; padding: 10px 12px; margin-bottom: 8px; cursor: pointer; transition: border-color .15s; }
 .adm-item:hover { border-color: var(--color-accent-300); }
 .adm-item.is-hidden { opacity: .6; }
 .adm-thumb { width: 64px; height: 80px; border-radius: 8px; overflow: hidden; background: var(--color-accent-100); display: grid; place-items: center; font-size: 11px; color: var(--color-accent-700); text-align: center; }
 .adm-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .adm-item-main { display: flex; flex-direction: column; min-width: 0; }
 .adm-item-main strong { font-size: 15.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.adm-item-price, .adm-item-stock { display: flex; flex-direction: column; gap: 4px; cursor: default; }
+.adm-item-price, .adm-item-stock, .adm-item-off { display: flex; flex-direction: column; gap: 4px; cursor: default; }
 .adm-price-input { display: flex; align-items: center; gap: 4px; border: 1px solid color-mix(in srgb, var(--color-text) 22%, transparent); border-radius: 8px; padding: 0 10px; height: 38px; background: #fff; }
 .adm-price-input:focus-within { outline: 2px solid var(--color-accent); border-color: var(--color-accent); }
 .adm-price-input input { border: 0; outline: 0; font: inherit; width: 100%; min-width: 0; background: none; padding: 0; }
@@ -137,13 +137,22 @@
 .adm-drop { margin-top: 10px; border: 2px dashed var(--color-accent-300); border-radius: 12px; padding: 48px 16px; text-align: center; color: var(--color-accent-700); font-size: 14px; }
 .adm-drop.is-over, .adm-photos:has(.adm-drop.is-over) .adm-photo-grid { background: var(--color-accent-100); }
 
+/* Descuentos / promo */
+.adm-promo { display: flex; gap: 12px 20px; align-items: center; justify-content: space-between; flex-wrap: wrap; background: #fff; border: 1px solid var(--color-divider); border-radius: 14px; padding: 14px 18px; margin-bottom: 16px; }
+.adm-promo p { margin: 2px 0 0; max-width: 60ch; }
+.adm-promo-form { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.adm-off-input { width: 88px; }
+.adm-badge.is-sale { background: var(--color-accent-700); color: #fff; }
+#discountHint { color: var(--color-accent-700); font-weight: 500; min-height: 1em; }
+
 /* Aviso flotante */
 .adm-toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); z-index: 100; max-width: min(560px, calc(100vw - 32px)); padding: 12px 18px; border-radius: 10px; font-size: 14.5px; box-shadow: 0 8px 30px rgba(0,0,0,.18); background: var(--color-accent-2-700); color: #fff; }
 .adm-toast.is-error { background: #b42318; }
 
 /* Mobile */
 @media (max-width: 900px) {
-  .adm-item { grid-template-columns: 56px minmax(0, 1fr) 120px; grid-template-areas: "thumb main main" "thumb price stock" "actions actions actions"; gap: 10px 12px; }
+  .adm-item { grid-template-columns: 56px minmax(0, 1fr) 84px 120px; grid-template-areas: "thumb main main main" "thumb price off stock" "actions actions actions actions"; gap: 10px 12px; }
+  .adm-item-off { grid-area: off; }
   .adm-thumb { grid-area: thumb; width: 56px; height: 70px; align-self: start; }
   .adm-item-main { grid-area: main; }
   .adm-item-price { grid-area: price; }
@@ -160,6 +169,7 @@
   .adm-brand span { display: none; }
   .adm-banner { flex-direction: column; align-items: stretch; }
   .adm-row2 { grid-template-columns: 1fr; }
+  .adm-item { grid-template-columns: 56px minmax(0, 1fr) 76px 116px; grid-template-areas: "thumb main main main" "price price off stock" "actions actions actions actions"; }
   .adm-toolbar .adm-input, .adm-toolbar .btn { flex: 1 1 100%; }
   .adm-dialog { width: 100vw; max-width: 100vw; max-height: 100dvh; height: 100dvh; border-radius: 0; margin: 0; }
   .adm-dialog form { max-height: 100dvh; height: 100%; }

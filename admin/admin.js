@@ -21,6 +21,18 @@ function esc(s) {
 const fmtPrice = (n) => "$" + Math.round(Number(n) || 0).toLocaleString("es-AR");
 const fmtNumber = (n) => Math.round(Number(n) || 0).toLocaleString("es-AR");
 const parsePrice = (s) => Number(String(s).replace(/[^0-9]/g, "")) || 0;
+const clampOff = (v) => Math.min(90, Math.max(0, Math.round(Number(v) || 0)));
+// Igual que en la tienda: precio con descuento redondeado a $100.
+const salePrice = (price, off) => (off ? Math.round(((Number(price) || 0) * (100 - off)) / 10000) * 100 : Number(price) || 0);
+const fmtWhen = (ms) => new Date(ms).toLocaleString("es-AR", { weekday: "long", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
+// <input type="datetime-local"> trabaja en hora local; en la base se guarda en ISO.
+const toIso = (v) => (v ? new Date(v).toISOString() : "");
+function toLocalInput(iso) {
+  const d = new Date(iso || "");
+  if (isNaN(d)) return "";
+  const p = (n) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`;
+}
 const fold = (s) => String(s || "").normalize("NFD").replace(/\p{Diacritic}/gu, "").toLowerCase();
 
 // Las fotos migradas se guardan como "assets/x.jpg" (servidas por el hosting);
@@ -190,7 +202,7 @@ async function reload() {
     state.sections = secSnap.docs.map((d) => ({ id: d.id, ...d.data() }));
     state.products = prodSnap.docs.map((d) => {
       const data = d.data();
-      return { ...data, id: d.id, images: normalizeImages(data.images), stock: Math.max(0, Math.floor(Number(data.stock) || 0)) };
+      return { ...data, id: d.id, images: normalizeImages(data.images), stock: Math.max(0, Math.floor(Number(data.stock) || 0)), discount: clampOff(data.discount) };
     });
     state.settings = setSnap.exists() ? setSnap.data() : {};
   } catch (err) {
@@ -228,6 +240,15 @@ function setupProductsTab() {
   $("#prodStockFilter").addEventListener("change", renderProducts);
   $("#newProductBtn").addEventListener("click", () => openProduct(null));
   $("#migrateBtn").addEventListener("click", migrateLegacy);
+  $("#bulkApply").addEventListener("click", () => {
+    const off = clampOff($("#bulkOff").value);
+    if (!off) {
+      $("#bulkOff").focus();
+      return toast("Escribí el porcentaje (de 1 a 90).", "error");
+    }
+    bulkDiscount(off);
+  });
+  $("#bulkClear").addEventListener("click", () => bulkDiscount(0));
 
   const list = $("#productList");
   list.addEventListener("click", async (e) => {
@@ -258,6 +279,11 @@ function setupProductsTab() {
       e.target.value = fmtNumber(price);
       if (price !== p.price) quickUpdate(p, { price });
     }
+    if (e.target.matches(".js-off")) {
+      const discount = clampOff(e.target.value);
+      e.target.value = discount || "";
+      if (discount !== (p.discount || 0)) quickUpdate(p, { discount });
+    }
     if (e.target.matches(".js-stock")) {
       const stock = Math.max(0, Math.floor(Number(e.target.value) || 0));
       if (stock !== p.stock) quickUpdate(p, { stock });
@@ -265,7 +291,7 @@ function setupProductsTab() {
     }
   });
   list.addEventListener("keydown", (e) => {
-    if (e.key === "Enter" && e.target.matches(".js-price, .js-stock")) e.target.blur();
+    if (e.key === "Enter" && e.target.matches(".js-price, .js-stock, .js-off")) e.target.blur();
   });
 }
 
@@ -280,6 +306,7 @@ function filteredProducts() {
     if (st === "in" && !(p.stock > 0)) return false;
     if (st === "out" && p.stock > 0) return false;
     if (st === "hidden" && p.visible !== false) return false;
+    if (st === "sale" && !(p.discount > 0)) return false;
     return true;
   });
 }
@@ -289,6 +316,7 @@ function renderProducts() {
   const items = filteredProducts();
   const total = state.products.length;
   const inStock = state.products.filter((p) => p.stock > 0).length;
+  renderPromoStatus();
   $("#prodSummary").textContent = total
     ? `${total} productos · ${inStock} disponibles · ${total - inStock} agotados` + (items.length !== total ? ` · mostrando ${items.length}` : "")
     : "";
@@ -333,11 +361,16 @@ function productRow(p) {
         ${out ? '<span class="adm-badge is-out">Agotado</span>' : '<span class="adm-badge is-in">Disponible</span>'}
         ${hidden ? '<span class="adm-badge">Oculto</span>' : ""}
         ${p.isNew ? '<span class="adm-badge is-new">Nuevo</span>' : ""}
+        ${p.discount ? `<span class="adm-badge is-sale">-${p.discount}% · ${fmtPrice(salePrice(p.price, p.discount))}</span>` : ""}
       </span>
     </div>
     <label class="adm-item-price">
       <span class="adm-small adm-muted">Precio</span>
       <span class="adm-price-input">$<input type="text" inputmode="numeric" class="js-price" value="${fmtNumber(p.price)}" aria-label="Precio de ${esc(p.name)}"></span>
+    </label>
+    <label class="adm-item-off">
+      <span class="adm-small adm-muted">Desc.</span>
+      <span class="adm-price-input"><input type="number" min="0" max="90" step="1" class="js-off" value="${p.discount || ""}" placeholder="0" aria-label="Descuento de ${esc(p.name)}">%</span>
     </label>
     <div class="adm-item-stock">
       <span class="adm-small adm-muted">Stock</span>
@@ -365,7 +398,7 @@ async function quickUpdate(p, changes) {
   renderProducts();
   try {
     await F.updateDoc(F.doc(db, "products", p.id), { ...changes, updatedAt: F.serverTimestamp() });
-    const what = "stock" in changes ? `Stock de ${p.name}: ${p.stock}` : "price" in changes ? `Precio de ${p.name}: ${fmtPrice(p.price)}` : "visible" in changes ? (p.visible ? `${p.name} ahora se ve en la tienda` : `${p.name} quedó oculto`) : "Guardado";
+    const what = "discount" in changes ? (p.discount ? `${p.name}: -${p.discount}% (${fmtPrice(salePrice(p.price, p.discount))})` : `${p.name}: sin descuento`) : "stock" in changes ? `Stock de ${p.name}: ${p.stock}` : "price" in changes ? `Precio de ${p.name}: ${fmtPrice(p.price)}` : "visible" in changes ? (p.visible ? `${p.name} ahora se ve en la tienda` : `${p.name} quedó oculto`) : "Guardado";
     toast(what);
   } catch (err) {
     Object.assign(p, before);
@@ -419,6 +452,9 @@ function setupProductDialog() {
     saveProduct();
   });
 
+  form.addEventListener("input", (e) => {
+    if (e.target === form.price || e.target === form.discount) updateDiscountHint();
+  });
   form.price.addEventListener("blur", () => {
     if (form.price.value.trim()) form.price.value = fmtNumber(parsePrice(form.price.value));
   });
@@ -497,6 +533,8 @@ function openProduct(id) {
   form.stock.value = p ? p.stock : 1;
   form.code.value = p ? p.code || "" : "";
   form.medidas.value = p ? p.medidas || "" : "";
+  form.discount.value = p && p.discount ? p.discount : "";
+  updateDiscountHint();
   form.desc.value = p ? p.desc || "" : "";
   form.visible.checked = p ? p.visible !== false : true;
   form.isNew.checked = p ? !!p.isNew : true;
@@ -638,6 +676,7 @@ async function saveProduct() {
       stock: Math.max(0, Math.floor(Number(form.stock.value) || 0)),
       sectionId,
       medidas: form.medidas.value.trim(),
+      discount: clampOff(form.discount.value),
       desc: form.desc.value.trim(),
       visible: form.visible.checked,
       isNew: form.isNew.checked,
@@ -674,6 +713,56 @@ async function saveProduct() {
   } finally {
     btn.disabled = false;
     status.textContent = "";
+  }
+}
+
+function updateDiscountHint() {
+  const form = $("#productForm");
+  const off = clampOff(form.discount.value);
+  const price = parsePrice(form.price.value);
+  $("#discountHint").textContent = off && price ? `Precio en la promo: ${fmtPrice(salePrice(price, off))}` : "";
+}
+
+/* ═════════════════════════ Descuentos / promo ═════════════════════════ */
+
+function renderPromoStatus() {
+  const el = $("#promoStatus");
+  if (!el) return;
+  const s = state.settings || {};
+  const title = s.promoTitle || "Cyber Monday";
+  const n = state.products.filter((p) => p.discount > 0).length;
+  const start = Date.parse(s.promoStart || "");
+  const end = Date.parse(s.promoEnd || "");
+  const now = Date.now();
+  let st;
+  if (!s.promoOn) st = "La promo está apagada: los descuentos no se ven en la tienda. Se prende en “Ajustes del sitio”.";
+  else if (end && now >= end) st = `${title} ya terminó (${fmtWhen(end)}). Los descuentos no se ven en la tienda.`;
+  else if (start && now < start) st = `${title} programado: empieza el ${fmtWhen(start)}.`;
+  else st = `${title} activo${end ? " hasta el " + fmtWhen(end) : ""}.`;
+  el.textContent = st + " " + (n ? `${n} producto${n === 1 ? "" : "s"} con descuento.` : "Ningún producto tiene descuento todavía.");
+}
+
+// Aplica (o quita) el descuento a todos los productos que se ven en la lista con el filtro actual.
+async function bulkDiscount(off) {
+  const items = filteredProducts().filter((p) => (p.discount || 0) !== off);
+  if (!items.length) return toast(off ? `Los productos de la lista ya tienen ${off}%.` : "Ningún producto de la lista tiene descuento.", "error");
+  const filtered = $("#prodSearch").value || $("#prodSectionFilter").value || $("#prodStockFilter").value;
+  const scope = filtered ? "de la lista filtrada" : "(todos)";
+  if (!confirm(off ? `¿Aplicar ${off}% de descuento a ${items.length} producto(s) ${scope}?` : `¿Quitar el descuento a ${items.length} producto(s) ${scope}?`)) return;
+  const before = items.map((p) => [p, p.discount || 0]);
+  const batch = F.writeBatch(db);
+  items.forEach((p) => {
+    p.discount = off;
+    batch.update(F.doc(db, "products", p.id), { discount: off, updatedAt: F.serverTimestamp() });
+  });
+  renderProducts();
+  try {
+    await batch.commit();
+    toast(off ? `Listo: ${items.length} producto(s) con ${off}% de descuento.` : `Listo: se quitó el descuento a ${items.length} producto(s).`);
+  } catch (err) {
+    before.forEach(([p, d]) => (p.discount = d));
+    renderProducts();
+    toast(errorMessage(err), "error");
   }
 }
 
@@ -855,10 +944,22 @@ function setupSettingsTab() {
     SETTING_KEYS.forEach((k) => (data[k] = form[k].value.trim()));
     data.whatsapp = data.whatsapp.replace(/[^0-9]/g, "");
     if (!data.whatsapp) return toast("El número de WhatsApp no puede quedar vacío.", "error");
+    data.promoOn = form.promoOn.checked;
+    data.promoTitle = form.promoTitle.value.trim();
+    data.promoText = form.promoText.value.trim();
+    data.promoStart = toIso(form.promoStart.value);
+    data.promoEnd = toIso(form.promoEnd.value);
+    if (data.promoOn && !data.promoEnd) {
+      form.promoEnd.focus();
+      return toast("Poné cuándo termina la promo (la cuenta regresiva la necesita).", "error");
+    }
+    if (data.promoStart && data.promoEnd && data.promoEnd <= data.promoStart)
+      return toast("La promo tiene que terminar después de que empieza.", "error");
     try {
       await F.setDoc(F.doc(db, "settings", "site"), data, { merge: true });
       state.settings = { ...state.settings, ...data };
       fillSettingsForm();
+      renderPromoStatus();
       toast("Ajustes guardados. Ya se ven en la tienda.");
     } catch (err) {
       toast(errorMessage(err), "error");
@@ -870,6 +971,11 @@ function fillSettingsForm() {
   const form = $("#settingsForm");
   const s = { ...LEGACY_SETTINGS, ...state.settings };
   SETTING_KEYS.forEach((k) => (form[k].value = s[k] || ""));
+  form.promoOn.checked = !!s.promoOn;
+  form.promoTitle.value = s.promoTitle || "";
+  form.promoText.value = s.promoText || "";
+  form.promoStart.value = toLocalInput(s.promoStart);
+  form.promoEnd.value = toLocalInput(s.promoEnd);
 }
 
 /* ═════════════════════════ Migración inicial ═════════════════════════ */

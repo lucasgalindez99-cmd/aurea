@@ -81,3 +81,17 @@ Queda en `https://TU-PROYECTO.web.app` y el panel en `https://TU-PROYECTO.web.ap
 - **Secciones:** pestaña *Secciones* → crear, renombrar (escribir sobre el nombre), ordenar, ocultar o eliminar. Si se elimina una sección, sus productos **no** se borran: pasan a “Sin sección”.
 - **Ajustes del sitio:** número de WhatsApp, mensaje automático, Instagram y textos principales de la página.
 - **Olvidé la contraseña:** en el login, escribir el correo y tocar “Olvidé mi contraseña”.
+
+---
+
+## Cyber Monday / promos con descuento
+
+1. **Cargar los descuentos:** pestaña *Productos* → columna **Desc.** (se escribe el % y se guarda solo), o desde el editor de cada producto.
+   Para hacerlo en bloque: filtrá la lista (por sección, búsqueda, etc.), escribí el % en el recuadro **Descuentos** y tocá *Aplicar a los de la lista*. *Quitar a los de la lista* los vuelve a 0.
+2. **Prender la promo:** *Ajustes del sitio* → **Cyber Monday / promo** → marcá *Promo activa*, poné el nombre, el texto de la cinta y la fecha de fin (y de inicio si es más adelante) → *Guardar ajustes*.
+3. **Qué se ve en la tienda mientras dura:** una cinta que corre arriba de todo, la cuenta regresiva en la portada, una pestaña nueva con todas las carteras rebajadas, el sello “-20%” en cada foto, el precio viejo tachado y el nuevo en dorado. El mensaje de WhatsApp ya sale con el precio con descuento.
+4. **Al llegar la fecha de fin se apaga sola.** Los descuentos quedan guardados (no se ven) para reusarlos en la próxima promo.
+
+- El precio con descuento se redondea a $100 (ej: $48.200 − 25% = $36.200).
+- Las carteras agotadas no muestran descuento.
+- Si la promo tiene fecha de inicio futura, la cinta y la cuenta regresiva anuncian “empieza en…”, pero los precios todavía no bajan.
