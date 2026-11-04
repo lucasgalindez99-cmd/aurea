@@ -720,26 +720,16 @@ function updateDiscountHint() {
   const form = $("#productForm");
   const off = clampOff(form.discount.value);
   const price = parsePrice(form.price.value);
-  $("#discountHint").textContent = off && price ? `Precio en la promo: ${fmtPrice(salePrice(price, off))}` : "";
+  $("#discountHint").textContent = off && price ? `Precio con descuento: ${fmtPrice(salePrice(price, off))}` : "";
 }
 
-/* ═════════════════════════ Descuentos / promo ═════════════════════════ */
+/* ═════════════════════════ Descuentos ═════════════════════════ */
 
 function renderPromoStatus() {
   const el = $("#promoStatus");
   if (!el) return;
-  const s = state.settings || {};
-  const title = s.promoTitle || "Cyber Monday";
   const n = state.products.filter((p) => p.discount > 0).length;
-  const start = Date.parse(s.promoStart || "");
-  const end = Date.parse(s.promoEnd || "");
-  const now = Date.now();
-  let st;
-  if (!s.promoOn) st = "La promo está apagada: los descuentos no se ven en la tienda. Se prende en “Ajustes del sitio”.";
-  else if (end && now >= end) st = `${title} ya terminó (${fmtWhen(end)}). Los descuentos no se ven en la tienda.`;
-  else if (start && now < start) st = `${title} programado: empieza el ${fmtWhen(start)}.`;
-  else st = `${title} activo${end ? " hasta el " + fmtWhen(end) : ""}.`;
-  el.textContent = st + " " + (n ? `${n} producto${n === 1 ? "" : "s"} con descuento.` : "Ningún producto tiene descuento todavía.");
+  el.textContent = "Se ven en la tienda en las carteras con stock, con el precio tachado. " + (n ? `${n} producto${n === 1 ? "" : "s"} con descuento.` : "Ningún producto tiene descuento todavía.");
 }
 
 // Aplica (o quita) el descuento a todos los productos que se ven en la lista con el filtro actual.
@@ -944,22 +934,10 @@ function setupSettingsTab() {
     SETTING_KEYS.forEach((k) => (data[k] = form[k].value.trim()));
     data.whatsapp = data.whatsapp.replace(/[^0-9]/g, "");
     if (!data.whatsapp) return toast("El número de WhatsApp no puede quedar vacío.", "error");
-    data.promoOn = form.promoOn.checked;
-    data.promoTitle = form.promoTitle.value.trim();
-    data.promoText = form.promoText.value.trim();
-    data.promoStart = toIso(form.promoStart.value);
-    data.promoEnd = toIso(form.promoEnd.value);
-    if (data.promoOn && !data.promoEnd) {
-      form.promoEnd.focus();
-      return toast("Poné cuándo termina la promo (la cuenta regresiva la necesita).", "error");
-    }
-    if (data.promoStart && data.promoEnd && data.promoEnd <= data.promoStart)
-      return toast("La promo tiene que terminar después de que empieza.", "error");
     try {
       await F.setDoc(F.doc(db, "settings", "site"), data, { merge: true });
       state.settings = { ...state.settings, ...data };
       fillSettingsForm();
-      renderPromoStatus();
       toast("Ajustes guardados. Ya se ven en la tienda.");
     } catch (err) {
       toast(errorMessage(err), "error");
@@ -971,11 +949,6 @@ function fillSettingsForm() {
   const form = $("#settingsForm");
   const s = { ...LEGACY_SETTINGS, ...state.settings };
   SETTING_KEYS.forEach((k) => (form[k].value = s[k] || ""));
-  form.promoOn.checked = !!s.promoOn;
-  form.promoTitle.value = s.promoTitle || "";
-  form.promoText.value = s.promoText || "";
-  form.promoStart.value = toLocalInput(s.promoStart);
-  form.promoEnd.value = toLocalInput(s.promoEnd);
 }
 
 /* ═════════════════════════ Migración inicial ═════════════════════════ */

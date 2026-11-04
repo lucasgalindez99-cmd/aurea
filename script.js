@@ -12,8 +12,6 @@ let settings = {
 let products = [];     // productos visibles, ya normalizados
 let groups = [];       // [{ id, name, slug, items: [índices de products] }]
 let activeSlug = null; // sección que se está mostrando (cada sección es una pestaña)
-let rawData = null;    // lo último que se cargó, para recalcular cuando la promo empieza o termina
-let promo = null;      // { live | upcoming, start, end } o null si no hay promo
 
 /* ════════════════ Datos ════════════════ */
 
@@ -101,12 +99,6 @@ function buildGroups(sections, prods) {
     p.slug = slug;
   });
   groups.forEach((g) => g.items.forEach((i) => (products[i].groupSlug = g.slug)));
-
-  // Promo activa: pestaña propia, primera, con las carteras rebajadas (siguen también en su sección).
-  if (promo && promo.live) {
-    const sale = sortIdx(groups.flatMap((g) => g.items).filter((i) => offPct(products[i])));
-    if (sale.length) groups.unshift({ id: "promo", name: promoTitle(), slug: slugify(promoTitle()) || "promo", items: sale });
-  }
 }
 
 /* ════════════════ Utilidades ════════════════ */
@@ -122,19 +114,8 @@ function slugify(s) {
 
 function formatPrice(n) { return "$" + Math.round(n).toLocaleString("es-AR"); }
 
-/* Promo (Cyber Monday): se prende desde el panel, con fecha de inicio y de fin. */
-const promoTitle = () => settings.promoTitle || "Cyber Monday";
-function computePromo() {
-  if (!settings.promoOn) return null;
-  const now = Date.now();
-  const start = Date.parse(settings.promoStart || "") || null;
-  const end = Date.parse(settings.promoEnd || "") || null;
-  if (end && now >= end) return null;
-  if (start && now < start) return { upcoming: true, start, end };
-  return { live: true, start, end };
-}
-const promoKey = (pr) => (pr ? (pr.live ? "live" : "soon") : "off");
-const offPct = (p) => (promo && promo.live && p.inStock && p.discount > 0 ? p.discount : 0);
+// Descuento: se carga por producto desde el panel y se ve siempre que haya stock.
+const offPct = (p) => (p.inStock && p.discount > 0 ? p.discount : 0);
 // Precio con descuento, redondeado a $100.
 const salePrice = (p) => {
   const off = offPct(p);
@@ -142,9 +123,6 @@ const salePrice = (p) => {
 };
 const priceHtml = (p) =>
   offPct(p) ? `<s>${formatPrice(p.price)}</s> <b>${formatPrice(salePrice(p))}</b>` : formatPrice(p.price);
-const fmtWhen = (ms) =>
-  new Date(ms).toLocaleString("es-AR", { weekday: "long", day: "numeric", hour: "2-digit", minute: "2-digit" });
-
 function placeholderSrc() {
   const svg = "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 320 400'>" +
     "<rect width='320' height='400' fill='#EFEAE4'/>" +
@@ -160,7 +138,7 @@ const waLink = (msg) => "https://wa.me/" + waNumber() + "?text=" + encodeURIComp
 const whatsappUrl = (p) => {
   const off = offPct(p);
   const line = p.name + " - " + formatPrice(salePrice(p)) +
-    (off ? ` (${promoTitle()} -${off}%, antes ${formatPrice(p.price)})` : "");
+    (off ? ` (-${off}%, antes ${formatPrice(p.price)})` : "");
   return waLink((settings.saludo || "Hola! Me interesa esta cartera:") + "\n\n" + line);
 };
 
@@ -483,7 +461,7 @@ function openModal(index, trigger, { push = true } = {}) {
   pd.gallery.classList.toggle("is-out", !p.inStock);
 
   pd.flags.innerHTML = (p.inStock ? `<span class="pd-flag is-in">Disponible</span>` : `<span class="pd-flag is-out">Agotada</span>`) +
-    (offPct(p) ? `<span class="pd-flag is-sale">${esc(promoTitle())} -${offPct(p)}%</span>` : "") +
+    (offPct(p) ? `<span class="pd-flag is-sale">-${offPct(p)}%</span>` : "") +
     (p.isNew && p.inStock ? `<span class="pd-flag">Nuevo</span>` : "");
   pd.name.textContent = p.name;
   pd.price.innerHTML = priceHtml(p);
@@ -523,71 +501,6 @@ function setupCardClicks() {
   });
 }
 
-/* ════════════════ Promo: cinta que corre y cuenta regresiva ════════════════ */
-
-function renderPromo() {
-  const bar = document.getElementById("promoBar");
-  const box = document.getElementById("promoCount");
-  if (!bar || !box) return;
-  if (!promo) {
-    bar.hidden = box.hidden = true;
-    return;
-  }
-  const title = promoTitle();
-  const bits = promo.live
-    ? [title, settings.promoText].filter(Boolean)
-    : [title, "Empieza el " + fmtWhen(promo.start), settings.promoText].filter(Boolean);
-  const run = bits.map((b) => `<span>${esc(b)}</span><i>✦</i>`).join("");
-  const half = `<span class="promo-run">${run.repeat(6)}</span>`;
-  bar.querySelector(".promo-track").innerHTML = half + half;
-  bar.setAttribute("aria-label", bits.join(". ") + (promo.live ? ". Ver las carteras con descuento" : ""));
-  bar.hidden = false;
-
-  const target = promo.live ? promo.end : promo.start;
-  box.hidden = !target;
-  box.querySelector(".promo-label").textContent = title + (promo.live ? " · termina en" : " · empieza en");
-  tickPromo();
-}
-
-function tickPromo() {
-  const now = computePromo();
-  if (promoKey(now) !== promoKey(promo)) return refreshCatalog(); // empezó o terminó: recalculamos precios
-  const box = document.getElementById("promoCount");
-  const target = promo && (promo.live ? promo.end : promo.start);
-  if (!box || !target) return;
-  const t = Math.max(0, Math.floor((target - Date.now()) / 1000));
-  const vals = { d: Math.floor(t / 86400), h: Math.floor((t % 86400) / 3600), m: Math.floor((t % 3600) / 60), s: t % 60 };
-  box.querySelectorAll("b[data-u]").forEach((el) => {
-    const v = String(vals[el.dataset.u]).padStart(2, "0");
-    if (el.textContent === v) return;
-    el.textContent = v;
-    el.classList.remove("tick");
-    void el.offsetWidth; // reinicia la animación del número
-    el.classList.add("tick");
-  });
-}
-
-function refreshCatalog() {
-  if (!rawData) return;
-  promo = computePromo();
-  buildGroups(rawData.sections, rawData.prods);
-  renderPromo();
-  renderHero();
-  render(true);
-}
-
-function setupPromoBar() {
-  const bar = document.getElementById("promoBar");
-  if (!bar) return;
-  bar.addEventListener("click", () => {
-    const g = groups.find((x) => x.id === "promo");
-    if (!g || g.slug === activeSlug) return;
-    activeSlug = g.slug;
-    history.replaceState(null, "", "?seccion=" + encodeURIComponent(g.slug));
-    render(true);
-  });
-}
-
 /* ════════════════ Arranque ════════════════ */
 
 async function init() {
@@ -595,25 +508,20 @@ async function init() {
   setupBrandHandoff();
   setupCardClicks();
   setupSectionTabs();
-  setupPromoBar();
   applySettings();
   renderSkeleton();
   try {
     let data = FIREBASE_READY ? await loadFromFirebase() : await loadFromLegacy();
     if (FIREBASE_READY && !data.prods.length && !data.sections.length) data = await loadFromLegacy();
     settings = { ...settings, ...data.site };
-    rawData = data;
-    promo = computePromo();
     buildGroups(data.sections, data.prods);
     activeSlug = slugFromUrl();
     const linked = productFromUrl();
     if (linked >= 0 && products[linked].groupSlug) activeSlug = products[linked].groupSlug;
     applySettings();
-    renderPromo();
     renderHero();
     render();
     if (linked >= 0) openModal(linked, null, { push: false });
-    setInterval(tickPromo, 1000);
   } catch (err) {
     console.error("[Áurea] No se pudo cargar el catálogo:", err);
     document.getElementById("catalogo-list").innerHTML = `<p class="catalog-msg">La colección no cargó. Revisá tu conexión y recargá la página, o <a href="${esc(waLink("Hola! Quiero consultar por el catálogo de Áurea Bags"))}" target="_blank" rel="noopener">escribinos por WhatsApp</a>.</p>`;

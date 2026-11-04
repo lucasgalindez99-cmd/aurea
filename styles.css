@@ -221,26 +221,7 @@ a { color: inherit; }
 .pd-cta .btn { width: 100%; }
 .pd-cta p { font-size: 13.5px; color: var(--stone); margin: 12px 0 0; text-align: center; }
 
-/* ───────── Promo (Cyber Monday) ───────── */
-/* Cinta que corre arriba de todo */
-.promo-bar { display: flex; align-items: center; height: 34px; overflow: hidden; background: var(--ink); color: #F6F0E3; text-decoration: none; white-space: nowrap; font-size: 12.5px; font-weight: 500; letter-spacing: .16em; text-transform: uppercase; }
-.promo-track { display: inline-flex; animation: promo-marquee 38s linear infinite; }
-.promo-bar:hover .promo-track { animation-play-state: paused; }
-.promo-run { display: inline-flex; align-items: center; }
-.promo-run span { padding: 0 18px; }
-.promo-run i { font-style: normal; color: #C9A35A; font-size: 10px; }
-@keyframes promo-marquee { to { transform: translateX(-50%); } }
-
-/* Cuenta regresiva en la portada */
-.promo-count { margin: 0 0 28px; animation: ph-in .8s .2s cubic-bezier(.2,.7,.1,1) both; }
-.promo-label { margin: 0 0 10px; font-size: 13px; font-weight: 500; letter-spacing: .14em; text-transform: uppercase; color: var(--gold-deep); }
-.promo-clock { display: flex; gap: 8px; }
-.promo-clock span { min-width: 66px; padding: 12px 6px 9px; background: var(--linen); border-radius: 4px; text-align: center; }
-.promo-clock b { display: block; font-family: var(--f-head); font-weight: 400; font-size: 32px; line-height: 1; font-variant-numeric: tabular-nums; }
-.promo-clock b.tick { animation: promo-tick .45s cubic-bezier(.2,.7,.1,1); }
-.promo-clock small { display: block; margin-top: 6px; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--stone); }
-@keyframes promo-tick { from { opacity: .2; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
-
+/* ───────── Descuentos ───────── */
 /* Sello de descuento sobre la foto */
 .card-sale { position: absolute; top: 12px; right: 12px; z-index: 2; padding: 5px 11px; border-radius: 3px; background: var(--gold-deep); color: var(--paper); font-size: 13px; font-weight: 600; letter-spacing: .02em; transform: rotate(-6deg); animation: promo-stamp .7s cubic-bezier(.2,.9,.3,1.3) both; animation-delay: calc(var(--d, 0) * 70ms + .25s); }
 @keyframes promo-stamp {
@@ -306,9 +287,6 @@ a { color: inherit; }
   .card-flag.is-out { bottom: 8px; }
   .card-sale { top: 8px; right: 8px; font-size: 12px; padding: 4px 8px; }
   .card.is-sale .card-price { text-align: left; }
-  .promo-bar { height: 30px; font-size: 11.5px; }
-  .promo-clock span { min-width: 0; flex: 1; }
-  .promo-clock b { font-size: 28px; }
   .shop-note { display: none; }
   .tab { font-size: 15px; padding: 15px 0 13px; }
   .buy-steps li { grid-template-columns: 48px 1fr; }
